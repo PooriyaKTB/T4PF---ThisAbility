@@ -1,0 +1,2056 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThisAbility — Empowering Independence, Safety &amp; Dignity</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #2563eb;
+        --secondary: #0f766e;
+        --accent: #f59e0b;
+        --bg-color: #f4f7fb;
+        --surface: #ffffff;
+        --surface-soft: #eef6ff;
+        --text-main: #172033;
+        --text-light: #667085;
+        --border: #d9e2ef;
+        --danger: #dc2626;
+        --success: #059669;
+        --warning: #b45309;
+        --shadow: 0 12px 30px rgba(31, 41, 55, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 14% 12%, rgba(20, 184, 166, 0.18), transparent 30%),
+          linear-gradient(135deg, #dde7f5, #f7fafc 52%, #e6f4ee);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 18px;
+        color: var(--text-main);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .phone-frame {
+        width: min(390px, 100%);
+        height: min(820px, calc(100vh - 36px));
+        min-height: 680px;
+        background-color: var(--bg-color);
+        border-radius: 38px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border: 8px solid #142033;
+      }
+
+      .phone-frame.large-text {
+        font-size: 1.08rem;
+      }
+
+      .phone-frame.high-contrast {
+        --primary: #0f172a;
+        --secondary: #14532d;
+        --bg-color: #ffffff;
+        --surface-soft: #f1f5f9;
+        --text-main: #020617;
+        --text-light: #334155;
+        --border: #64748b;
+      }
+
+      .phone-frame.calm-ui .ble-broadcast {
+        animation: none;
+      }
+
+      .demo-locked header,
+      .demo-locked .content,
+      .demo-locked nav,
+      .demo-locked .toast {
+        display: none;
+      }
+
+      .auth-screen {
+        flex: 1;
+        display: none;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 24px;
+        padding: 52px 22px 32px;
+        background:
+          linear-gradient(180deg, rgba(37, 99, 235, 0.1), transparent 42%),
+          var(--bg-color);
+      }
+
+      .demo-locked .auth-screen {
+        display: flex;
+      }
+
+      .auth-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+      }
+
+      .auth-mark {
+        width: 96px;
+        height: 96px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
+      }
+
+      .auth-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .notch {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 145px;
+        height: 24px;
+        background-color: #142033;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        z-index: 10;
+      }
+
+      header {
+        background: linear-gradient(135deg, #1d4ed8, #0f766e);
+        color: white;
+        padding: 40px 20px 18px;
+        border-bottom-left-radius: 22px;
+        border-bottom-right-radius: 22px;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+        font-weight: 800;
+      }
+
+      .user-profile {
+        border: none;
+        color: white;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .user-profile:focus-visible,
+      .nav-item:focus-visible,
+      .module-btn:focus-visible,
+      .mode-chip:focus-visible,
+      .primary-btn:focus-visible,
+      .secondary-btn:focus-visible,
+      .danger-btn:focus-visible,
+      .switch:focus-visible {
+        outline: 3px solid rgba(245, 158, 11, 0.85);
+        outline-offset: 2px;
+      }
+
+      .status-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 6px 9px;
+        background: rgba(255, 255, 255, 0.16);
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 18px 86px;
+        scroll-behavior: smooth;
+      }
+
+      .screen {
+        display: none;
+      }
+
+      @keyframes screenFadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .screen.active {
+        display: block;
+        animation: screenFadeIn 0.22s ease;
+      }
+
+      .scan-alert-item {
+        margin-top: 8px;
+        padding: 10px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 0.78rem;
+        line-height: 1.4;
+        animation: screenFadeIn 0.22s ease;
+      }
+
+      .card,
+      .module-btn,
+      .route-map,
+      .metric {
+        background: var(--surface);
+        border: 1px solid rgba(217, 226, 239, 0.76);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      }
+
+      .card {
+        padding: 15px;
+        margin-bottom: 14px;
+      }
+
+      .section-title {
+        font-size: 0.82rem;
+        color: var(--text-light);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .routing-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface-soft);
+        border: 1px solid #d9e9ff;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+
+      .routing-input i {
+        color: var(--primary);
+        width: 20px;
+        text-align: center;
+      }
+
+      .routing-input input,
+      .routing-input select {
+        border: none;
+        background: transparent;
+        width: 100%;
+        min-width: 0;
+        outline: none;
+        color: var(--text-main);
+      }
+
+      .primary-btn,
+      .secondary-btn,
+      .danger-btn {
+        width: 100%;
+        border: none;
+        padding: 11px 12px;
+        border-radius: 10px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+      }
+
+      .primary-btn {
+        background: var(--primary);
+        color: white;
+      }
+
+      .secondary-btn {
+        background: #e8f1ff;
+        color: #1e40af;
+      }
+
+      .danger-btn {
+        background: #fee2e2;
+        color: var(--danger);
+      }
+
+      .mode-grid,
+      .modules-grid,
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .mode-chip {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px;
+        background: white;
+        color: var(--text-main);
+        font-size: 0.75rem;
+        font-weight: 800;
+        min-height: 40px;
+      }
+
+      .mode-chip.active {
+        border-color: var(--primary);
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .alert-box {
+        border-left: 4px solid var(--danger);
+        background: #fff7f7;
+      }
+
+      .alert-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--danger);
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+
+      .alert-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .alert-actions button {
+        flex: 1;
+      }
+
+      .muted {
+        color: var(--text-light);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+
+      .small {
+        font-size: 0.72rem;
+      }
+
+      .route-map {
+        overflow: hidden;
+        min-height: 170px;
+        position: relative;
+        background:
+          linear-gradient(90deg, rgba(37, 99, 235, 0.12) 1px, transparent 1px),
+          linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px),
+          #f8fbff;
+        background-size: 42px 42px;
+        margin-bottom: 14px;
+      }
+
+      .route-line {
+        position: absolute;
+        left: 34px;
+        top: 114px;
+        width: 274px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 999px;
+        transform: rotate(-12deg);
+        transform-origin: left center;
+      }
+
+      .route-line::before,
+      .route-line::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        background: white;
+        border: 5px solid var(--primary);
+      }
+
+      .route-line::before {
+        left: -4px;
+      }
+
+      .route-line::after {
+        right: -4px;
+        border-color: var(--secondary);
+      }
+
+      .map-tag {
+        position: absolute;
+        border-radius: 999px;
+        padding: 6px 9px;
+        background: white;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+        font-size: 0.7rem;
+        font-weight: 800;
+      }
+
+      .tag-start {
+        left: 8px;
+        bottom: 10px;
+      }
+
+      .tag-end {
+        right: 8px;
+        top: 10px;
+      }
+
+      .tag-alert {
+        left: 50%;
+        top: 10px;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+
+      .route-result {
+        display: none;
+        border-top: 1px solid var(--border);
+        margin-top: 12px;
+        padding-top: 12px;
+      }
+
+      .route-result.visible {
+        display: block;
+      }
+
+      .steps {
+        list-style: none;
+        display: grid;
+        gap: 9px;
+        margin-top: 10px;
+      }
+
+      .steps li {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 8px;
+        align-items: start;
+        font-size: 0.8rem;
+      }
+
+      .step-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f1ff;
+        color: var(--primary);
+      }
+
+      .module-btn {
+        border: none;
+        padding: 14px 10px;
+        text-align: left;
+        transition:
+          transform 0.18s ease,
+          border-color 0.18s ease;
+        min-height: 112px;
+      }
+
+      .module-btn:active {
+        transform: scale(0.98);
+      }
+
+      .module-btn.active {
+        border-color: var(--primary);
+        background: #f7fbff;
+      }
+
+      .module-btn i {
+        font-size: 1.45rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+
+      .module-btn h4 {
+        font-size: 0.86rem;
+        margin-bottom: 4px;
+      }
+
+      .module-btn p {
+        color: var(--text-light);
+        font-size: 0.7rem;
+        line-height: 1.25;
+      }
+
+      .module-detail {
+        display: none;
+        margin-top: 12px;
+        background: #f8fbff;
+        border: 1px solid #d9e9ff;
+      }
+
+      .module-detail.visible {
+        display: block;
+      }
+
+      .e-passport-card {
+        background: linear-gradient(135deg, #0f172a, #1d4ed8 58%, #0f766e);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+      }
+
+      .ble-broadcast {
+        width: 78px;
+        height: 78px;
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 14px;
+        font-size: 2rem;
+        animation: pulse 2s infinite;
+      }
+
+      .ble-broadcast.paused {
+        animation: none;
+        opacity: 0.65;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 19px rgba(255, 255, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+      }
+
+      .privacy-badge {
+        background: rgba(16, 185, 129, 0.18);
+        color: #bbf7d0;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-weight: 800;
+      }
+
+      .setting-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .profile-hero {
+        display: grid;
+        grid-template-columns: 62px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .avatar {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #2563eb, #0f766e);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.65rem;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+      }
+
+      .profile-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .profile-actions .secondary-btn {
+        min-width: 0;
+        padding-inline: 8px;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .form-field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .form-field label {
+        color: var(--text-light);
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .form-field input,
+      .form-field select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: white;
+        color: var(--text-main);
+        padding: 10px;
+        min-height: 42px;
+        outline: none;
+      }
+
+      .form-field input:focus,
+      .form-field select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+      }
+
+      .preference-preview {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+      }
+
+      .profile-item,
+      .setting-item,
+      .guardian-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .profile-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .profile-item:last-child {
+        border-bottom: none;
+      }
+
+      .chip {
+        border-radius: 999px;
+        padding: 5px 8px;
+        background: #ecfdf5;
+        color: var(--success);
+        font-size: 0.68rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .chip.warning {
+        background: #fffbeb;
+        color: var(--warning);
+      }
+
+      .chip.info {
+        background: #e8f1ff;
+        color: #1d4ed8;
+      }
+
+      .switch {
+        width: 46px;
+        height: 26px;
+        border: none;
+        border-radius: 999px;
+        background: #cbd5e1;
+        position: relative;
+        flex: 0 0 auto;
+        transition: background 0.18s ease;
+      }
+
+      .switch::after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.18s ease;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+      }
+
+      .switch.on {
+        background: var(--success);
+      }
+
+      .switch.on::after {
+        transform: translateX(20px);
+      }
+
+      .metric {
+        padding: 12px;
+        min-height: 86px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.18rem;
+        margin-bottom: 4px;
+      }
+
+      .toast {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        top: 36px;
+        background: #111827;
+        color: white;
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.82rem;
+        opacity: 0;
+        transform: translateY(-12px);
+        pointer-events: none;
+        transition:
+          opacity 0.22s ease,
+          transform 0.22s ease;
+        z-index: 30;
+      }
+
+      .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      nav {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: var(--surface);
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 4px 22px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.08);
+      }
+
+      .nav-item {
+        border: none;
+        background: transparent;
+        text-align: center;
+        color: var(--text-light);
+        min-width: 58px;
+        padding: 4px 0 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .nav-item.active {
+        color: var(--primary);
+      }
+
+      .nav-item i {
+        font-size: 1.05rem;
+        width: 40px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        transition: background 0.18s ease;
+      }
+
+      .nav-item.active i {
+        background: rgba(37, 99, 235, 0.12);
+      }
+
+      .nav-item span {
+        font-size: 0.64rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.01em;
+      }
+
+      @media (max-height: 720px) {
+        .phone-frame {
+          height: calc(100vh - 24px);
+          min-height: 620px;
+        }
+
+        header {
+          padding-top: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main
+      class="phone-frame demo-locked"
+      id="phone-frame"
+      aria-label="ThisAbility app"
+    >
+      <div class="notch"></div>
+
+      <section class="auth-screen" aria-label="Sign in to ThisAbility">
+        <div class="auth-brand">
+          <img src="logo-full.png" alt="ThisAbility — Empowering Independence, Safety &amp; Dignity" style="width:200px; max-width:72%;" />
+        </div>
+
+        <form class="auth-card" id="auth-form">
+          <div class="section-title">Create your access profile</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="auth-name">Your name</label>
+              <input id="auth-name" type="text" placeholder="Enter your name" autocomplete="name" />
+            </div>
+            <div class="form-field">
+              <label for="auth-disability">Primary access need</label>
+              <select id="auth-disability">
+                <option value="">Select your access need…</option>
+                <option value="Wheelchair / Mobility" selected>Wheelchair / Mobility</option>
+                <option value="Visual impairment">Visual impairment</option>
+                <option value="Hearing impairment">Hearing impairment</option>
+                <option value="Cognitive / Neurodivergent">Cognitive / Neurodivergent</option>
+                <option value="Chronic condition">Chronic condition</option>
+                <option value="Anxiety / Sensory sensitivity">Anxiety / Sensory sensitivity</option>
+                <option value="Multiple conditions">Multiple conditions</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="auth-guardian">Emergency contact name</label>
+              <input id="auth-guardian" type="text" placeholder="Enter guardian details" value="" autocomplete="name" />
+            </div>
+          </div>
+          <div class="privacy-notice" style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+            <i class="fas fa-lock" style="color:var(--success);margin-top:2px;flex-shrink:0;" aria-hidden="true"></i>
+            <p style="font-size:0.72rem;color:#166534;line-height:1.45;">Your access profile and medical details are <strong>stored securely on your device only</strong>. We never upload sensitive data to a server.</p>
+          </div>
+          <div class="auth-actions">
+            <button class="primary-btn" type="submit">
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>
+              Get Started
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <header>
+        <div class="header-top">
+          <div class="logo" style="display:flex;align-items:center;gap:8px;">
+            <img src="logo-icon.png" alt="" aria-hidden="true" style="width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1);flex-shrink:0;" />
+            ThisAbility
+          </div>
+          <button
+            class="user-profile"
+            type="button"
+            id="profile-open"
+            aria-label="Open profile"
+          >
+            <i class="fas fa-user-circle" aria-hidden="true"></i>
+            <span id="user-chip-name"></span> (Pro)
+          </button>
+        </div>
+        <h2 id="screen-heading"></h2>
+        <p class="small" id="screen-subtitle" style="margin-top: 5px; opacity: 0.9">
+          Plan a safer journey with live access intelligence.
+        </p>
+        <div class="status-row" aria-label="Live service status">
+          <span class="status-pill">
+            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+            On-device
+          </span>
+          <span class="status-pill">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <span id="crowd-count">3</span> verified
+          </span>
+          <span class="status-pill">
+            <i class="fas fa-route" aria-hidden="true"></i>
+            <span id="route-state">Ready</span>
+          </span>
+        </div>
+      </header>
+
+      <div class="content" id="content">
+        <section class="screen active" data-screen="explore">
+          <form class="card" id="route-form">
+            <div class="section-title">Accessible Routing</div>
+            <div class="routing-input" style="position:relative;">
+              <i class="fas fa-map-marker-alt" aria-hidden="true" style="color:var(--danger);"></i>
+              <input id="current-location" type="text" value="London, Waterloo" placeholder="Enter your start location" style="flex:1;" />
+              <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
+                <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="routing-input">
+              <i class="fas fa-search" aria-hidden="true"></i>
+              <input
+                id="destination"
+                type="text"
+                placeholder="Where to? (e.g. Waterloo Station)"
+                autocomplete="off"
+              />
+            </div>
+            <div class="mode-grid" aria-label="Route needs">
+              <button class="mode-chip active" type="button" data-mode="Step-free">
+                Step-free
+              </button>
+              <button class="mode-chip" type="button" data-mode="Low crowd">
+                Low crowd
+              </button>
+              <button class="mode-chip" type="button" data-mode="Quiet">
+                Quiet
+              </button>
+              <button class="mode-chip" type="button" data-mode="Fastest">
+                Fastest
+              </button>
+            </div>
+            <div style="margin-top:8px;">
+              <button class="mode-chip" type="button" data-mode="AI Agent" id="ai-route-chip" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--secondary);color:var(--secondary);">
+                <i class="fas fa-robot" aria-hidden="true"></i>
+                AI Agent — adapts to your profile &amp; live conditions
+              </button>
+            </div>
+            <button class="primary-btn" type="submit" style="margin-top: 12px">
+              <i class="fas fa-magic" aria-hidden="true"></i>
+              Find Safe Route
+            </button>
+            <div class="route-result" id="route-result" aria-live="polite">
+              <strong id="route-title">Route prepared</strong>
+              <p class="muted" id="route-summary"></p>
+              <ol class="steps" id="route-steps"></ol>
+            </div>
+          </form>
+
+          <div class="route-map" aria-label="Illustrated accessible route map">
+            <div class="route-line"></div>
+            <span class="map-tag tag-start" id="map-start">London Bridge Station</span>
+            <span class="map-tag tag-alert" id="map-alert-tag" style="color:var(--danger);">
+              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> lift outage
+            </span>
+            <span class="map-tag tag-end" id="map-destination">Waterloo</span>
+          </div>
+
+          <div class="card alert-box" id="alert-card">
+            <div class="alert-header">
+              <span>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                Live Obstacle Alert
+              </span>
+              <span class="chip warning" id="alert-status">Unresolved</span>
+            </div>
+            <p class="muted">
+              <strong>TfL data:</strong> Lift out of service at Waterloo Station.
+              Crowd telemetry confirms the barrier and proposes a step-free interchange via Southwark.
+            </p>
+            <div class="alert-actions">
+              <button class="secondary-btn" type="button" id="reroute-btn">
+                <i class="fas fa-random" aria-hidden="true"></i>
+                Reroute
+              </button>
+              <button class="secondary-btn" type="button" id="verify-btn">
+                <i class="fas fa-check" aria-hidden="true"></i>
+                Verify
+              </button>
+            </div>
+          </div>
+
+          <div class="modules-grid">
+            <button class="module-btn active" type="button" data-module="map">
+              <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+              <h4>Dynamic Map</h4>
+              <p>Predicts barriers with live city and crowd data.</p>
+            </button>
+            <button class="module-btn" type="button" data-module="alerts">
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <h4>Surround Alerts</h4>
+              <p>Micro-obstacle and sensory warning layer.</p>
+            </button>
+            <button class="module-btn" type="button" data-module="passport">
+              <i class="fas fa-id-card" aria-hidden="true"></i>
+              <h4>CapAble ID</h4>
+              <p>Optional BLE access profile for venues.</p>
+            </button>
+            <button class="module-btn" type="button" data-module="guardian">
+              <i class="fas fa-heart-pulse" aria-hidden="true"></i>
+              <h4>Guardian</h4>
+              <p>Fall detection connected to routing context.</p>
+            </button>
+          </div>
+          <div class="card module-detail visible" id="module-detail">
+            <strong id="module-title">Dynamic Map</strong>
+            <p class="muted" id="module-copy">
+              Routes combine public transport status, static accessibility data,
+              and community-verified obstacles before suggesting a journey.
+            </p>
+          </div>
+
+          <div class="card" id="surround-scan-card" style="display:none;">
+            <div class="section-title">Surround Scan — Live</div>
+            <p class="muted" style="margin-bottom:10px; font-size:0.78rem;">
+              Detecting micro-obstacles, crowd density, and sensory load on your current route.
+            </p>
+            <button class="secondary-btn" type="button" id="surround-scan-btn">
+              <i class="fas fa-wifi" aria-hidden="true"></i>
+              Start proximity scan
+            </button>
+            <div id="surround-alerts-list" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="passport">
+          <div class="e-passport-card">
+            <div class="ble-broadcast" id="ble-orb">
+              <i class="fab fa-bluetooth-b" aria-hidden="true"></i>
+            </div>
+            <h3 id="ble-title">CapAble ID Broadcasting</h3>
+            <p class="small" style="margin-top: 6px; opacity: 0.9">
+              Your non-verbal access profile for trusted venues and transport operators.
+            </p>
+            <div class="privacy-badge">
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              Article 9 sensitive data stays on-device
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="profile-item">
+              <div>
+                <strong>Mobility profile</strong>
+                <p class="muted" id="passport-mobility">
+                  Step-free access, ramp preferred, seated waiting areas.
+                </p>
+              </div>
+              <span class="chip">Shared</span>
+            </div>
+            <div class="profile-item">
+              <div>
+                <strong>Sensory profile</strong>
+                <p class="muted" id="passport-sensory">
+                  Quiet guidance and advance crowd warnings.
+                </p>
+              </div>
+              <span class="chip">Shared</span>
+            </div>
+            <div class="profile-item">
+              <div>
+                <strong>Medical profile</strong>
+                <p class="muted">Emergency-only disclosure to your named guardian contact.</p>
+              </div>
+              <span class="chip warning">Locked</span>
+            </div>
+          </div>
+
+          <div class="card guardian-status">
+            <div>
+              <strong>BLE broadcast</strong>
+              <p class="muted">Pause when you do not wish venues to detect your profile.</p>
+            </div>
+            <button
+              class="switch on"
+              type="button"
+              id="ble-toggle"
+              data-managed="true"
+              aria-label="Toggle BLE broadcasting"
+              aria-pressed="true"
+            ></button>
+          </div>
+
+          <button class="secondary-btn" type="button" id="simulate-venue">
+            <i class="fas fa-building" aria-hidden="true"></i>
+            Simulate venue scan
+          </button>
+          <div id="venue-scan-result" aria-live="polite" style="margin-top:10px;"></div>
+        </section>
+
+        <section class="screen" data-screen="guardian">
+          <div class="card guardian-status">
+            <div>
+              <h4>
+                <i class="fas fa-heart-pulse" style="color: var(--danger)" aria-hidden="true"></i>
+                Active Guardian
+              </h4>
+              <p class="muted">Fall, sensory overload, medical episodes — continuous protection.</p>
+            </div>
+            <button
+              class="switch on"
+              type="button"
+              id="guardian-toggle"
+              data-managed="true"
+              aria-label="Toggle Active Guardian"
+              aria-pressed="true"
+            ></button>
+          </div>
+
+          <div class="metrics-grid" style="margin-bottom: 14px">
+            <div class="metric">
+              <strong id="guardian-state">Armed</strong>
+              <p class="muted">Guardian status</p>
+            </div>
+            <div class="metric">
+              <strong>2 min</strong>
+              <p class="muted">Response target</p>
+            </div>
+            <div class="metric">
+              <strong>3</strong>
+              <p class="muted">Alert types active</p>
+            </div>
+            <div class="metric">
+              <strong id="guardian-contact-display">Maya</strong>
+              <p class="muted">Emergency contact</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">What Guardian monitors</div>
+            <ol class="steps">
+              <li>
+                <span class="step-icon" style="background:#fee2e2;color:var(--danger);"><i class="fas fa-circle-exclamation" aria-hidden="true"></i></span>
+                <span><strong>Fall &amp; tip-over</strong> — Phone gyroscope detects sudden impact or wheelchair tip.</span>
+              </li>
+              <li>
+                <span class="step-icon" style="background:#fef3c7;color:var(--warning);"><i class="fas fa-brain" aria-hidden="true"></i></span>
+                <span><strong>Sensory / anxiety overload</strong> — Detects repeated distress gestures or triggered by you.</span>
+              </li>
+              <li>
+                <span class="step-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-heart-pulse" aria-hidden="true"></i></span>
+                <span><strong>Medical episode</strong> — Wearable or manual trigger sends medical profile context to responders.</span>
+              </li>
+              <li>
+                <span class="step-icon" style="background:#dbeafe;color:var(--primary);"><i class="fas fa-map-pin" aria-hidden="true"></i></span>
+                <span><strong>Emergency chain</strong> — Location, route, and access needs compiled locally and sent to your emergency contact.</span>
+              </li>
+            </ol>
+          </div>
+
+          <div class="section-title" style="margin-bottom:8px;">Simulate an alert</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <button class="danger-btn" type="button" id="fall-test" style="font-size:0.78rem;">
+              <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+              Fall / Tip-over
+            </button>
+            <button class="danger-btn" type="button" id="anxiety-test" style="background:#fef3c7;color:var(--warning);font-size:0.78rem;">
+              <i class="fas fa-brain" aria-hidden="true"></i>
+              Sensory Overload
+            </button>
+          </div>
+          <button class="danger-btn" type="button" id="panic-test" style="background:#ede9fe;color:#7c3aed;margin-bottom:14px;">
+            <i class="fas fa-heart-pulse" aria-hidden="true"></i>
+            Medical Episode / SOS Panic
+          </button>
+          <div id="guardian-sim-result" aria-live="polite"></div>
+        </section>
+
+        <section class="screen" data-screen="settings">
+          <div class="card profile-hero">
+            <div class="avatar" aria-hidden="true">
+              <i class="fas fa-user"></i>
+            </div>
+            <div>
+              <h3 id="profile-display-name"></h3>
+              <p class="muted">Pro member · <span id="profile-display-location"></span> · Personal access profile</p>
+              <div class="status-row" style="margin-top: 8px">
+                <span class="chip info">Profile <span id="profile-completeness">86</span>%</span>
+                <span class="chip">On-device vault</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <form id="profile-form">
+              <div class="section-title">Editable user profile</div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="profile-name">Display name</label>
+                  <input id="profile-name" type="text" value="" autocomplete="name" />
+                </div>
+                <div class="form-field">
+                  <label for="profile-location">Home city</label>
+                  <input id="profile-location" type="text" value="London" />
+                </div>
+                <div class="form-field">
+                  <label for="mobility-pref">Mobility need</label>
+                  <select id="mobility-pref">
+                    <option value="Step-free" selected>Step-free access</option>
+                    <option value="Low crowd">Low-crowd transfers</option>
+                    <option value="Fastest">Fastest route</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="sensory-pref">Sensory preference</label>
+                  <select id="sensory-pref">
+                    <option value="Quiet" selected>Quiet guidance</option>
+                    <option value="Standard">Standard guidance</option>
+                    <option value="Detailed">Detailed guidance</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="alert-pref">Alert style</label>
+                  <select id="alert-pref">
+                    <option value="Haptic first" selected>Haptic first</option>
+                    <option value="Visual first">Visual first</option>
+                    <option value="Audio + visual">Audio + visual</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="text-pref">Text size</label>
+                  <select id="text-pref">
+                    <option value="standard" selected>Standard</option>
+                    <option value="large">Larger text</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="contrast-pref">Visual mode</label>
+                  <select id="contrast-pref">
+                    <option value="standard" selected>Standard contrast</option>
+                    <option value="high">High contrast</option>
+                    <option value="calm">Calm / reduced motion</option>
+                  </select>
+                </div>
+                <div class="form-field" style="grid-column:1/-1;">
+                  <label>Allergies &amp; health notes</label>
+                  <select id="allergy-category" style="margin-bottom:6px;">
+                    <option value="">No known allergies</option>
+                    <option value="Medication allergy">Medication allergy</option>
+                    <option value="Food allergy">Food allergy</option>
+                    <option value="Environmental allergy">Environmental allergy</option>
+                    <option value="Latex allergy">Latex allergy</option>
+                    <option value="Insect sting allergy">Insect sting allergy</option>
+                    <option value="Multiple / other">Multiple / other</option>
+                  </select>
+                  <input id="allergy-description" type="text" placeholder="e.g. penicillin — carry epi-pen; epilepsy" style="font-size:0.82rem;margin-bottom:6px;" />
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:var(--surface-soft);border-radius:9px;border:1px solid var(--border);">
+                    <div>
+                      <p style="font-size:0.78rem;font-weight:700;color:var(--text-main);">Share with trusted venues</p>
+                      <p class="muted" style="font-size:0.68rem;">Allows venues to prepare appropriate assistance for your needs</p>
+                    </div>
+                    <button class="switch" type="button" id="allergy-share-toggle" data-managed="true" aria-label="Share allergy info with venues" aria-pressed="false"></button>
+                  </div>
+                </div>
+              </div>
+              <div class="preference-preview">
+                <strong>Current profile impact</strong>
+                <p class="muted" id="profile-needs">
+                  Step-free routes, quiet guidance, haptic-first alerts.
+                </p>
+              </div>
+              <div class="profile-actions">
+                <button class="primary-btn" type="submit" id="save-profile">
+                  <i class="fas fa-check" aria-hidden="true"></i>
+                  Save profile
+                </button>
+                <button class="secondary-btn" type="button" id="profile-passport">
+                  <i class="fas fa-id-card" aria-hidden="true"></i>
+                  CapAble ID
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Trusted guardian</div>
+            <div class="profile-item">
+              <div>
+                <strong id="guardian-name-display">—</strong>
+                <p class="muted">Emergency-only access to route context and health record.</p>
+              </div>
+              <span class="chip warning">Consent locked</span>
+            </div>
+            <div class="profile-actions">
+              <button class="secondary-btn" type="button" id="guardian-shortcut">
+                <i class="fas fa-user-shield" aria-hidden="true"></i>
+                Guardian
+              </button>
+              <button class="secondary-btn" type="button" id="profile-demo-reset">
+                <i class="fas fa-rotate-left" aria-hidden="true"></i>
+                Reset profile
+              </button>
+            </div>
+          </div>
+
+          <div class="card guardian-status">
+            <div>
+              <strong>Profile sharing</strong>
+              <p class="muted">Only mobility and sensory hints are shared with trusted venues via CapAble ID.</p>
+            </div>
+            <button
+              class="switch on"
+              type="button"
+              id="profile-sharing"
+              aria-label="Toggle profile sharing"
+              aria-pressed="true"
+            ></button>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Privacy and data</div>
+            <div class="setting-list">
+              <div class="setting-item">
+                <div>
+                  <strong>Predictive city data</strong>
+                  <p class="muted">Use live TfL, Network Rail, and smart-city feeds.</p>
+                </div>
+                <button class="switch on" type="button" aria-label="Toggle city data"></button>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <strong>Crowd telemetry</strong>
+                  <p class="muted">Share anonymised obstacle confirmations to help others.</p>
+                </div>
+                <button class="switch on" type="button" aria-label="Toggle crowd telemetry" data-feature="crowd-telemetry"></button>
+              </div>
+              <div class="setting-item">
+                <div>
+                  <strong>Venue profile exchange</strong>
+                  <p class="muted">Allow trusted venues and transport operators to read your CapAble ID hints.</p>
+                </div>
+                <button class="switch on" type="button" aria-label="Toggle venue exchange"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Smart city impact</div>
+            <div class="metrics-grid">
+              <div class="metric">
+                <strong id="barrier-count">18</strong>
+                <p class="muted">Barriers logged this week</p>
+              </div>
+              <div class="metric">
+                <strong>92%</strong>
+                <p class="muted">Journeys kept step-free</p>
+              </div>
+              <div class="metric">
+                <strong>6</strong>
+                <p class="muted">Venue partners</p>
+              </div>
+              <div class="metric">
+                <strong>API</strong>
+                <p class="muted">B2G reporting ready</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite">
+        <i class="fas fa-info-circle" aria-hidden="true"></i>
+        <span id="toast-message">Updated</span>
+      </div>
+
+      <nav aria-label="Primary">
+        <button class="nav-item active" type="button" data-screen-target="explore">
+          <i class="fas fa-compass" aria-hidden="true"></i>
+          <span>Explore</span>
+        </button>
+        <button class="nav-item" type="button" data-screen-target="passport">
+          <i class="fas fa-id-card" aria-hidden="true"></i>
+          <span>CapAble ID</span>
+        </button>
+        <button class="nav-item" type="button" data-screen-target="guardian">
+          <i class="fas fa-shield-alt" aria-hidden="true"></i>
+          <span>Guardian</span>
+        </button>
+        <button class="nav-item" type="button" data-screen-target="settings">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </main>
+
+    <script>
+      const phoneFrame = document.getElementById("phone-frame");
+      const authForm = document.getElementById("auth-form");
+      const authName = document.getElementById("auth-name");
+      const content = document.getElementById("content");
+      const destinationInput = document.getElementById("destination");
+      const routeResult = document.getElementById("route-result");
+      const routeTitle = document.getElementById("route-title");
+      const routeSummary = document.getElementById("route-summary");
+      const routeSteps = document.getElementById("route-steps");
+      const mapDestination = document.getElementById("map-destination");
+      const routeState = document.getElementById("route-state");
+      const crowdCount = document.getElementById("crowd-count");
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toast-message");
+      const moduleTitle = document.getElementById("module-title");
+      const moduleCopy = document.getElementById("module-copy");
+      const alertStatus = document.getElementById("alert-status");
+      const bleOrb = document.getElementById("ble-orb");
+      const bleTitle = document.getElementById("ble-title");
+      const guardianState = document.getElementById("guardian-state");
+      const barrierCount = document.getElementById("barrier-count");
+      const profileCompleteness = document.getElementById("profile-completeness");
+      const profileNeeds = document.getElementById("profile-needs");
+      const userChipName = document.getElementById("user-chip-name");
+      const profileDisplayName = document.getElementById("profile-display-name");
+      const profileDisplayLocation = document.getElementById("profile-display-location");
+      const profileName = document.getElementById("profile-name");
+      const profileLocation = document.getElementById("profile-location");
+      const mobilityPref = document.getElementById("mobility-pref");
+      const sensoryPref = document.getElementById("sensory-pref");
+      const alertPref = document.getElementById("alert-pref");
+      const textPref = document.getElementById("text-pref");
+      const contrastPref = document.getElementById("contrast-pref");
+      const passportMobility = document.getElementById("passport-mobility");
+      const passportSensory = document.getElementById("passport-sensory");
+
+      let selectedMode = "Step-free";
+      let verifiedReports = 3;
+      let barriersLogged = 18;
+      let toastTimer;
+      let currentScreen = "explore";
+      let initialProfile = null;
+
+      const userProfile = {
+        name: "",
+        email: "",
+        location: "London",
+        disability: "",
+        guardian: "",
+        allergyCategory: "",
+        allergyDescription: "",
+        allergyShareVenue: false,
+        mobility: "Step-free",
+        sensory: "Quiet",
+        alert: "Haptic first",
+        text: "standard",
+        contrast: "standard",
+      };
+
+      const screenCopy = {
+        explore: {
+          heading: "",
+          subtitle: "Plan a safer journey with live accessibility intelligence.",
+        },
+        passport: {
+          heading: "CapAble ID",
+          subtitle: "Share your access needs with venues — without saying a word.",
+        },
+        guardian: {
+          heading: "Active Guardian",
+          subtitle: "24/7 safety monitoring linked to your route and access profile.",
+        },
+        settings: {
+          heading: "",
+          subtitle: "Manage your access needs, privacy consent, and app preferences.",
+        },
+      };
+
+      const moduleContent = {
+        map: {
+          title: "Dynamic Map",
+          copy:
+            "Routes combine live TfL data, community-verified obstacles, and your access profile before proposing a journey — updated in real time.",
+        },
+        alerts: {
+          title: "Surround Alerts",
+          copy:
+            "Receive proactive warnings for micro-obstacles, crowd surges, steep kerb drops, and sensory load — before you reach them on your route.",
+        },
+        passport: {
+          title: "CapAble ID",
+          copy:
+            "Your BLE access profile lets trusted venues understand your needs without any verbal explanation. Sensitive health data never leaves your device.",
+        },
+        guardian: {
+          title: "Active Guardian",
+          copy:
+            "Continuous monitoring for falls, tip-overs, sensory overload, and medical episodes — with automatic alerts to your emergency contact and contextual data for responders.",
+        },
+      };
+
+      const showToast = (message) => {
+        toastMessage.textContent = message;
+        toast.classList.add("visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+          toast.classList.remove("visible");
+        }, 2600);
+      };
+
+      const firstName = () => userProfile.name.trim().split(/\s+/)[0] || "Sarah";
+
+      const getGreeting = () => {
+        const h = new Date().getHours();
+        return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
+      };
+
+      const profileImpactText = () =>
+        `${userProfile.mobility} routes, ${userProfile.sensory.toLowerCase()} guidance, ${userProfile.alert.toLowerCase()} alerts.`;
+
+      const syncModeButtons = () => {
+        document.querySelectorAll(".mode-chip").forEach((chip) => {
+          chip.classList.toggle("active", chip.dataset.mode === selectedMode);
+        });
+      };
+
+      const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || "Maya";
+
+      const updateProfileUi = () => {
+        userChipName.textContent = firstName();
+        profileDisplayName.textContent = userProfile.name;
+        profileDisplayLocation.textContent = userProfile.location;
+        profileName.value = userProfile.name;
+        profileLocation.value = userProfile.location;
+        mobilityPref.value = userProfile.mobility;
+        sensoryPref.value = userProfile.sensory;
+        alertPref.value = userProfile.alert;
+        textPref.value = userProfile.text;
+        contrastPref.value = userProfile.contrast;
+        const allergyCatEl = document.getElementById("allergy-category");
+        if (allergyCatEl) allergyCatEl.value = userProfile.allergyCategory || "";
+        const allergyDescEl = document.getElementById("allergy-description");
+        if (allergyDescEl) allergyDescEl.value = userProfile.allergyDescription || "";
+        const allergyShareEl = document.getElementById("allergy-share-toggle");
+        if (allergyShareEl) {
+          allergyShareEl.classList.toggle("on", userProfile.allergyShareVenue);
+          allergyShareEl.setAttribute("aria-pressed", String(userProfile.allergyShareVenue));
+        }
+        profileNeeds.textContent = profileImpactText();
+        passportMobility.textContent =
+          userProfile.mobility === "Fastest"
+            ? "Fastest route preferred, with access risk warnings still visible."
+            : `${userProfile.disability || userProfile.mobility} profile — ${userProfile.mobility} access, ramp preferred, seated waiting areas.`;
+        passportSensory.textContent =
+          `${userProfile.sensory} guidance, ${userProfile.alert.toLowerCase()} alerts.`;
+        const gcDisplay = document.getElementById("guardian-contact-display");
+        if (gcDisplay) gcDisplay.textContent = guardianFirstName();
+        const guardianNameEl = document.getElementById("guardian-name-display");
+        if (guardianNameEl) guardianNameEl.textContent = userProfile.guardian;
+        phoneFrame.classList.toggle("large-text", userProfile.text === "large");
+        phoneFrame.classList.toggle("high-contrast", userProfile.contrast === "high");
+        phoneFrame.classList.toggle("calm-ui", userProfile.contrast === "calm");
+        selectedMode = userProfile.mobility;
+        syncModeButtons();
+        if (currentScreen === "explore") {
+          document.getElementById("screen-heading").textContent =
+            `${getGreeting()}, ${firstName()}!`;
+        }
+        if (currentScreen === "settings") {
+          document.getElementById("screen-heading").textContent =
+            `${firstName()}'s Profile`;
+        }
+        document.getElementById("profile-open").setAttribute("aria-label", `Open ${firstName()}'s profile`);
+      };
+
+      const unlockDemo = (message) => {
+        phoneFrame.classList.remove("demo-locked");
+        setScreen("explore");
+        updateProfileUi();
+        showToast(message);
+      };
+
+      const setScreen = (screenName) => {
+        currentScreen = screenName;
+        document.querySelectorAll(".screen").forEach((screen) => {
+          screen.classList.toggle("active", screen.dataset.screen === screenName);
+        });
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.toggle("active", item.dataset.screenTarget === screenName);
+        });
+        document.getElementById("screen-heading").textContent =
+          screenName === "explore"
+            ? `${getGreeting()}, ${firstName()}!`
+            : screenName === "settings"
+              ? `${firstName()}'s Profile`
+              : screenCopy[screenName].heading;
+        document.getElementById("screen-subtitle").textContent =
+          screenCopy[screenName].subtitle;
+        content.scrollTop = 0;
+      };
+
+      const buildRoute = (destination, mode) => {
+        const cleanDestination = destination.trim() || "Waterloo";
+        const from = document.getElementById("current-location")?.value.trim() || "London Bridge";
+        const isWaterloo = cleanDestination.toLowerCase().includes("waterloo");
+        const isAI = mode === "AI Agent";
+        const minutes = isAI ? 24 : mode === "Fastest" ? 21 : mode === "Quiet" ? 29 : 26;
+        const confidence = isWaterloo ? "High confidence" : "Medium confidence";
+        const interchange = isWaterloo ? "Southwark" : "a verified step-free stop";
+        const alertDetail =
+          userProfile.alert === "Audio + visual"
+            ? "Audio and visual alerts enabled"
+            : `${userProfile.alert} alerts enabled`;
+
+        updateMapStart(from);
+        updateMapAlert(mode, cleanDestination);
+        mapDestination.textContent =
+          cleanDestination.length > 14
+            ? `${cleanDestination.slice(0, 13)}…`
+            : cleanDestination;
+        routeTitle.textContent = isAI
+          ? `AI-optimised route to ${cleanDestination}`
+          : `${mode} route to ${cleanDestination}`;
+        routeSummary.textContent = isAI
+          ? `${minutes} min journey. AI Agent analysed your ${userProfile.disability || "mobility"} profile, live TfL data, and crowd telemetry. ${confidence}. ${alertDetail}.`
+          : `${minutes} min journey. ${confidence}: ${userProfile.mobility.toLowerCase()} preference applied, ${userProfile.sensory.toLowerCase()} guidance active, and crowd reports checked.`;
+        const steps = isAI
+          ? [
+              ["fa-robot", `AI Agent: Barrier-free path identified from ${from} using live sensor data.`],
+              ["fa-train", `Take Jubilee Line toward ${interchange} (step-free, 68% crowd forecast: low).`],
+              ["fa-brain", `Sensory load alert pre-queued for Waterloo concourse — ${userProfile.sensory} mode.`],
+              ["fa-id-card", `CapAble ID ready to broadcast ${userProfile.disability || "access"} hints to venue.`],
+              ["fa-flag-checkered", `Arrive at ${cleanDestination}. Guardian monitoring active.`],
+            ]
+          : [
+              ["fa-train", `Take Jubilee Line toward ${interchange}.`],
+              ["fa-wheelchair", "Use step-free interchange; avoid the reported Waterloo lift."],
+              ["fa-bell", `${alertDetail} before the station concourse.`],
+              ["fa-flag-checkered", `Arrive at ${cleanDestination} with CapAble ID ready.`],
+            ];
+        routeSteps.innerHTML = steps
+          .map(([icon, text]) => `
+              <li>
+                <span class="step-icon"><i class="fas ${icon}" aria-hidden="true"></i></span>
+                <span>${text}</span>
+              </li>`)
+          .join("");
+        routeResult.classList.add("visible");
+        routeState.textContent = "Route set";
+        showToast(isAI ? "AI Agent route ready — personalised to your profile." : "Safe route prepared with barrier-aware routing.");
+      };
+
+      authForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = authName.value.trim();
+        if (!name) {
+          authName.style.borderColor = "var(--danger)";
+          authName.style.boxShadow = "0 0 0 3px rgba(220,38,38,0.15)";
+          authName.focus();
+          showToast("Please enter your name to continue.");
+          setTimeout(() => { authName.style.borderColor = ""; authName.style.boxShadow = ""; }, 2200);
+          return;
+        }
+        userProfile.name = name;
+        const disabilityEl = document.getElementById("auth-disability");
+        if (disabilityEl && disabilityEl.value) userProfile.disability = disabilityEl.value;
+        const guardianEl = document.getElementById("auth-guardian");
+        if (guardianEl && guardianEl.value.trim()) userProfile.guardian = guardianEl.value.trim();
+        initialProfile = { ...userProfile };
+        unlockDemo(`Welcome, ${firstName()}!`);
+      });
+
+      document.getElementById("gps-btn").addEventListener("click", () => {
+        const loc = "London, Pancras Square";
+        document.getElementById("current-location").value = loc;
+        updateMapStart(loc);
+        showToast("Location set to London, Pancras Square.");
+      });
+
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.addEventListener("click", () => setScreen(item.dataset.screenTarget));
+      });
+
+      document.getElementById("profile-open").addEventListener("click", () => {
+        setScreen("settings");
+        showToast("Profile opened.");
+      });
+
+      const getMapAlertData = (mode, dest) => {
+        const d = (dest || destinationInput.value || "").toLowerCase();
+        const modeDefaults = {
+          "Step-free": { icon: "fa-triangle-exclamation", text: "lift outage",     color: "var(--danger)"    },
+          "Low crowd": { icon: "fa-users",                text: "high crowd zone", color: "var(--warning)"   },
+          "Quiet":     { icon: "fa-volume-high",          text: "noise alert",     color: "var(--warning)"   },
+          "Fastest":   { icon: "fa-bolt",                 text: "route clear",     color: "var(--success)"   },
+          "AI Agent":  { icon: "fa-robot",                text: "AI scanning",     color: "var(--secondary)" },
+        };
+        const base = modeDefaults[mode] || modeDefaults["Step-free"];
+        if (mode === "Step-free") {
+          if (d.includes("king") || d.includes("pancras") || d.includes("euston") || d.includes("st pancras")) {
+            return { icon: "fa-circle-check", text: "step-free via lift", color: "var(--success)" };
+          }
+          if (d.includes("bank") || d.includes("monument") || d.includes("stratford")) {
+            return { icon: "fa-circle-check", text: "fully step-free", color: "var(--success)" };
+          }
+          if (d.includes("waterloo") || d.includes("canary") || d.includes("paddington")) {
+            return { icon: "fa-triangle-exclamation", text: "lift outage", color: "var(--danger)" };
+          }
+        }
+        if (mode === "Low crowd" && (d.includes("victoria") || d.includes("oxford"))) {
+          return { icon: "fa-users", text: "very high crowd", color: "var(--danger)" };
+        }
+        return base;
+      };
+
+      const updateMapAlert = (mode, dest) => {
+        const alertTag = document.getElementById("map-alert-tag");
+        if (!alertTag) return;
+        const data = getMapAlertData(mode, dest);
+        alertTag.style.color = data.color;
+        alertTag.innerHTML = `<i class="fas ${data.icon}" aria-hidden="true"></i> ${data.text}`;
+      };
+
+      const updateMapStart = (val) => {
+        const startTag = document.getElementById("map-start");
+        if (startTag && val.trim()) {
+          const short = val.trim().length > 18 ? val.trim().slice(0, 17) + "…" : val.trim();
+          startTag.textContent = short;
+        }
+      };
+
+      const updateMapEnd = (val) => {
+        const endTag = document.getElementById("map-destination");
+        if (endTag) {
+          const short = val.trim().length > 14 ? val.trim().slice(0, 13) + "…" : (val.trim() || "Destination");
+          endTag.textContent = short;
+        }
+      };
+
+      document.getElementById("current-location").addEventListener("input", (e) => {
+        updateMapStart(e.target.value);
+      });
+
+      destinationInput.addEventListener("input", (e) => {
+        updateMapEnd(e.target.value);
+        updateMapAlert(selectedMode, e.target.value);
+      });
+
+      document.querySelectorAll(".mode-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          selectedMode = chip.dataset.mode;
+          syncModeButtons();
+          updateMapAlert(selectedMode);
+          showToast(`${selectedMode} preference selected.`);
+        });
+      });
+
+      document.getElementById("route-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const submitBtn = event.currentTarget.querySelector("button[type=submit]");
+        const originalHTML = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        const isAI = selectedMode === "AI Agent";
+        submitBtn.innerHTML = isAI
+          ? '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> AI agent analysing profile &amp; live conditions…'
+          : '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Calculating route…';
+        routeState.textContent = "Routing…";
+        setTimeout(() => {
+          buildRoute(destinationInput.value, selectedMode);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHTML;
+        }, 2000);
+      });
+
+      document.getElementById("reroute-btn").addEventListener("click", () => {
+        selectedMode = userProfile.mobility;
+        syncModeButtons();
+        buildRoute(destinationInput.value || "Waterloo", selectedMode);
+        alertStatus.textContent = "Rerouted";
+        alertStatus.classList.remove("warning");
+        alertStatus.classList.add("info");
+      });
+
+      document.getElementById("verify-btn").addEventListener("click", () => {
+        verifiedReports += 1;
+        crowdCount.textContent = verifiedReports;
+        alertStatus.textContent = "Verified";
+        alertStatus.classList.remove("warning");
+        alertStatus.classList.add("info");
+        showToast("Thanks. Your anonymous verification improved route confidence.");
+      });
+
+      document.querySelectorAll(".module-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const module = moduleContent[button.dataset.module];
+          document.querySelectorAll(".module-btn").forEach((item) => {
+            item.classList.toggle("active", item === button);
+          });
+          moduleTitle.textContent = module.title;
+          moduleCopy.textContent = module.copy;
+          const surroundCard = document.getElementById("surround-scan-card");
+          const isAlerts = button.dataset.module === "alerts";
+          surroundCard.style.display = isAlerts ? "block" : "none";
+          if (!isAlerts) {
+            document.getElementById("surround-alerts-list").innerHTML = "";
+          }
+          showToast(`${module.title} selected.`);
+        });
+      });
+
+      document.querySelectorAll(".switch").forEach((switchButton) => {
+        switchButton.addEventListener("click", () => {
+          const isOn = !switchButton.classList.contains("on");
+          switchButton.classList.toggle("on", isOn);
+          switchButton.setAttribute("aria-pressed", String(isOn));
+          if (!switchButton.dataset.managed) {
+            showToast(isOn ? "Setting enabled." : "Setting paused.");
+          }
+        });
+      });
+
+      document.getElementById("ble-toggle").addEventListener("click", () => {
+        const isOn = document.getElementById("ble-toggle").classList.contains("on");
+        bleOrb.classList.toggle("paused", !isOn);
+        bleTitle.textContent = isOn ? "CapAble ID Broadcasting" : "CapAble ID Paused";
+        showToast(isOn
+          ? "CapAble ID broadcasting to nearby venues."
+          : "CapAble ID paused — venues cannot detect your profile.");
+      });
+
+      document.getElementById("simulate-venue").addEventListener("click", () => {
+        const broadcasting = document.getElementById("ble-toggle").classList.contains("on");
+        const resultEl = document.getElementById("venue-scan-result");
+        resultEl.innerHTML = "";
+        if (!broadcasting) {
+          resultEl.innerHTML = `<div class="card" style="border-left:3px solid var(--danger);padding:12px;margin-top:8px;animation:screenFadeIn 0.22s ease;">
+            <p style="color:var(--danger);font-size:0.8rem;font-weight:800;"><i class="fas fa-ban" style="margin-right:6px;"></i>Venue scan blocked</p>
+            <p class="muted" style="margin-top:4px;">BLE broadcasting is paused. Enable it to allow venues to read your access hints.</p>
+          </div>`;
+          showToast("Venue scan blocked — BLE broadcasting is paused.");
+          return;
+        }
+        const btn = document.getElementById("simulate-venue");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Scanning…';
+        setTimeout(() => showToast("Venue BLE reader detected your CapAble ID…"), 0);
+        setTimeout(() => showToast("Verifying profile consent settings…"), 1000);
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-building" aria-hidden="true"></i> Simulate venue scan';
+          const allergyRow = userProfile.allergyShareVenue && userProfile.allergyCategory
+            ? `<div style="display:flex;justify-content:space-between;"><span class="muted">Allergy</span><strong>${userProfile.allergyCategory}${userProfile.allergyDescription ? " — " + userProfile.allergyDescription : ""}</strong></div>`
+            : "";
+          const notSharedNote = userProfile.allergyShareVenue
+            ? "Medical record, name, ID, and location — locked on-device."
+            : "Medical record, name, ID, location, and health notes — locked on-device.";
+          resultEl.innerHTML = `<div class="card" style="border-left:3px solid var(--success);padding:12px;margin-top:8px;animation:screenFadeIn 0.22s ease;">
+            <p style="color:var(--success);font-weight:800;font-size:0.8rem;margin-bottom:8px;"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Venue received your access hints</p>
+            <div style="display:grid;gap:6px;font-size:0.78rem;">
+              <div style="display:flex;justify-content:space-between;"><span class="muted">Access need</span><strong>${userProfile.disability || "Mobility"}</strong></div>
+              <div style="display:flex;justify-content:space-between;"><span class="muted">Mobility</span><strong>${userProfile.mobility} access</strong></div>
+              <div style="display:flex;justify-content:space-between;"><span class="muted">Sensory</span><strong>${userProfile.sensory} guidance</strong></div>
+              <div style="display:flex;justify-content:space-between;"><span class="muted">Alerts</span><strong>${userProfile.alert}</strong></div>
+              ${allergyRow}
+            </div>
+            <div style="margin-top:8px;padding:8px;background:#fee2e2;border-radius:8px;font-size:0.72rem;color:var(--danger);">
+              <i class="fas fa-lock" style="margin-right:4px;"></i><strong>Not shared:</strong> ${notSharedNote}
+            </div>
+          </div>`;
+          showToast("Venue received your access hints. Sensitive data protected.");
+        }, 2000);
+      });
+
+      document.getElementById("profile-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        userProfile.name = profileName.value.trim() || userProfile.name;
+        userProfile.location = profileLocation.value.trim() || userProfile.location;
+        userProfile.mobility = mobilityPref.value;
+        userProfile.sensory = sensoryPref.value;
+        userProfile.alert = alertPref.value;
+        userProfile.text = textPref.value;
+        userProfile.contrast = contrastPref.value;
+        const allergyCatEl = document.getElementById("allergy-category");
+        if (allergyCatEl) userProfile.allergyCategory = allergyCatEl.value;
+        const allergyDescEl = document.getElementById("allergy-description");
+        if (allergyDescEl) userProfile.allergyDescription = allergyDescEl.value.trim();
+        const allergyShareEl = document.getElementById("allergy-share-toggle");
+        if (allergyShareEl) userProfile.allergyShareVenue = allergyShareEl.classList.contains("on");
+        profileCompleteness.textContent = "100";
+        updateProfileUi();
+        showToast("Profile saved. The app now follows these preferences.");
+      });
+
+      document.getElementById("profile-passport").addEventListener("click", () => {
+        setScreen("passport");
+        showToast(`CapAble ID opened from ${firstName()}'s profile.`);
+      });
+
+      document.getElementById("guardian-shortcut").addEventListener("click", () => {
+        setScreen("guardian");
+        showToast("Guardian settings opened.");
+      });
+
+      document.getElementById("profile-demo-reset").addEventListener("click", () => {
+        if (initialProfile) {
+          Object.assign(userProfile, { ...initialProfile });
+        }
+        profileCompleteness.textContent = "86";
+        updateProfileUi();
+        showToast(`Profile reset to your original settings, ${firstName()}.`);
+      });
+
+      document.getElementById("guardian-toggle").addEventListener("click", () => {
+        const isOn = document.getElementById("guardian-toggle").classList.contains("on");
+        guardianState.textContent = isOn ? "Armed" : "Paused";
+        showToast(isOn
+          ? "Guardian armed. Fall detection is active."
+          : "Guardian paused. Re-enable for continuous safety monitoring.");
+      });
+
+      const surroundAlertsData = [
+        { icon: "fa-arrow-down",         color: "var(--warning)", label: "Kerb drop",      text: "Steep kerb drop in 14m — haptic alert queued for your profile." },
+        { icon: "fa-users",              color: "var(--primary)", label: "Crowd density",  text: "High crowd density ahead (68%) — quiet alternative available in 30m." },
+        { icon: "fa-compress",           color: "var(--warning)", label: "Narrow passage", text: "Narrow passage confirmed on route — wheelchair clearance 0.9m." },
+      ];
+
+      document.getElementById("surround-scan-btn").addEventListener("click", () => {
+        const list = document.getElementById("surround-alerts-list");
+        const btn  = document.getElementById("surround-scan-btn");
+        list.innerHTML = "";
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Scanning…';
+
+        surroundAlertsData.forEach(({ icon, color, label, text }, i) => {
+          setTimeout(() => {
+            const item = document.createElement("div");
+            item.className = "scan-alert-item";
+            item.style.borderLeft = `3px solid ${color}`;
+            item.innerHTML = `<i class="fas ${icon}" style="color:${color}; margin-right:6px;" aria-hidden="true"></i><strong>${label}:</strong> ${text}`;
+            list.appendChild(item);
+            showToast(`${label} — ${text.split("—")[0].trim()}`);
+          }, (i + 1) * 1000);
+        });
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-wifi" aria-hidden="true"></i> Rescan area';
+          showToast("Scan complete. 3 proximity alerts detected on your route.");
+        }, (surroundAlertsData.length + 1) * 1000);
+      });
+
+      const runGuardianSim = (type) => {
+        const isArmed = document.getElementById("guardian-toggle").classList.contains("on");
+        if (!isArmed) {
+          showToast("Guardian is paused. Re-enable it to run simulations.");
+          return;
+        }
+        const resultEl = document.getElementById("guardian-sim-result");
+        resultEl.innerHTML = "";
+        const contact = userProfile.guardian || "your emergency contact";
+
+        const scenarios = {
+          fall: {
+            steps: [
+              { delay: 0,    icon: "fa-circle-exclamation", msg: "Sudden impact detected by gyroscope — possible fall or tip-over." },
+              { delay: 1400, icon: "fa-map-pin",        msg: "Compiling GPS location, current route, and access profile…" },
+              { delay: 2800, icon: "fa-user-shield",    msg: `Alerting ${contact} — 30-second cancel window active.` },
+              { delay: 4200, icon: "fa-check-circle",   msg: "Fall alert chain complete. Responder has route context." },
+            ],
+            color: "var(--danger)",
+            label: "Fall / tip-over",
+          },
+          anxiety: {
+            steps: [
+              { delay: 0,    icon: "fa-brain",          msg: "Sensory overload pattern detected — repeated distress gesture recognised." },
+              { delay: 1400, icon: "fa-route",          msg: "Identifying quieter route alternative with lower sensory load…" },
+              { delay: 2800, icon: "fa-user-shield",    msg: `Low-key alert sent to ${contact} — no alarm, soft check-in.` },
+              { delay: 4200, icon: "fa-check-circle",   msg: "Anxiety alert complete. Quiet support chain notified." },
+            ],
+            color: "var(--warning)",
+            label: "Sensory overload",
+          },
+          panic: {
+            steps: [
+              { delay: 0,    icon: "fa-heart-pulse",    msg: "Medical episode / SOS triggered by user." },
+              { delay: 1400, icon: "fa-shield",  msg: "Sending encrypted medical note and location to emergency services…" },
+              { delay: 2800, icon: "fa-user-shield",    msg: `${contact} and emergency services receiving your access and allergy profile.` },
+              { delay: 4200, icon: "fa-check-circle",   msg: "SOS chain complete. Responders have full context." },
+            ],
+            color: "#7c3aed",
+            label: "Medical SOS",
+          },
+        };
+
+        const { steps, color, label } = scenarios[type];
+        steps.forEach(({ delay, icon, msg }) => {
+          setTimeout(() => {
+            showToast(msg);
+            const item = document.createElement("div");
+            item.className = "scan-alert-item";
+            item.style.borderLeft = `3px solid ${color}`;
+            item.innerHTML = `<i class="fas ${icon}" style="color:${color};margin-right:6px;" aria-hidden="true"></i>${msg}`;
+            resultEl.appendChild(item);
+          }, delay);
+        });
+        setTimeout(() => { routeState.textContent = "SOS ready"; }, 4200);
+      };
+
+      document.getElementById("fall-test").addEventListener("click", () => runGuardianSim("fall"));
+      document.getElementById("anxiety-test").addEventListener("click", () => runGuardianSim("anxiety"));
+      document.getElementById("panic-test").addEventListener("click", () => runGuardianSim("panic"));
+
+      document.querySelectorAll(".setting-list .switch").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.dataset.feature === "crowd-telemetry") {
+            const isNowOn = button.classList.contains("on");
+            barriersLogged = Math.max(0, barriersLogged + (isNowOn ? 1 : -1));
+            barrierCount.textContent = barriersLogged;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
