@@ -32,3 +32,13 @@ initExplore();
 initPassport();
 initGuardian();
 initSettings();
+
+// On mobile, briefly make the document scrollable to trigger the browser
+// toolbar to retract, then restore. position:fixed on .phone-frame means
+// there is no document overflow after this settles.
+if (window.innerWidth <= 520) {
+  const html = document.documentElement;
+  html.style.height = `${window.innerHeight + 1}px`;
+  window.scrollTo(0, 1);
+  setTimeout(() => { html.style.height = ''; }, 400);
+}

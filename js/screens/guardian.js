@@ -50,6 +50,7 @@ const runGuardianSim = (type) => {
       item.style.borderLeft = `3px solid ${color}`;
       item.innerHTML = `<i class="fas ${icon}" style="color:${color};margin-right:6px;" aria-hidden="true"></i>${msg}`;
       resultEl.appendChild(item);
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, delay);
   });
   setTimeout(() => { document.getElementById('route-state').textContent = 'SOS ready'; }, 4200);

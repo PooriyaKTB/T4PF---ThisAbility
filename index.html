@@ -35,8 +35,8 @@
           <div class="section-title">Create your access profile</div>
           <div class="form-grid">
             <div class="form-field">
-              <label for="auth-name">Your name</label>
-              <input id="auth-name" type="text" placeholder="Enter your name" autocomplete="name" />
+              <label for="auth-name">Your name <span style="color:var(--danger)">*</span></label>
+              <input id="auth-name" type="text" placeholder="Enter your name" required autocomplete="name" />
             </div>
             <div class="form-field">
               <label for="auth-disability">Primary access need</label>
@@ -53,8 +53,8 @@
               </select>
             </div>
             <div class="form-field">
-              <label for="auth-guardian">Emergency contact name</label>
-              <input id="auth-guardian" type="text" placeholder="Enter guardian details" value="" autocomplete="name" />
+              <label for="auth-guardian">Emergency contact name <span style="color:var(--danger)">*</span></label>
+              <input id="auth-guardian" type="text" placeholder="Guardian's full name" required autocomplete="name" />
             </div>
           </div>
           <div class="privacy-notice" style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">

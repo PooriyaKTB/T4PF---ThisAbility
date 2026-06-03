@@ -57,6 +57,7 @@ export const init = () => {
         </div>
       </div>`;
       showToast('Venue received your access hints. Sensitive data protected.');
+      setTimeout(() => resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
     }, 2000);
   });
 };

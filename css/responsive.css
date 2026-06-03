@@ -16,14 +16,15 @@
     padding: 0;
     background: var(--bg-color);
     align-items: flex-start;
-    min-height: 100dvh;
-    overflow: hidden;
   }
 
+  /* position:fixed + inset:0 fills the visible viewport regardless of the
+     browser toolbar state, letting the toolbar retract freely without
+     causing layout shifts or the page being cut off. */
   .phone-frame {
+    position: fixed;
+    inset: 0;
     width: 100%;
-    height: 100vh;
-    height: 100dvh; /* dynamic viewport height — accounts for browser chrome */
     min-height: unset;
     border-radius: 0;
     border: none;
