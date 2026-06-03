@@ -1,0 +1,45 @@
+.auth-screen {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 24px;
+  padding: 52px 22px 32px;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.1), transparent 42%),
+    var(--bg-color);
+}
+
+.demo-locked .auth-screen {
+  display: flex;
+}
+
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.auth-mark {
+  width: 96px;
+  height: 96px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
+}
+
+.auth-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}

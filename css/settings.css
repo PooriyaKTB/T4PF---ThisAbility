@@ -1,0 +1,39 @@
+.profile-hero {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2563eb, #0f766e);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.65rem;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+}
+
+.profile-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.profile-actions .secondary-btn {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
+.preference-preview {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+}
