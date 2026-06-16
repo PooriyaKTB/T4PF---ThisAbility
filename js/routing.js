@@ -1,6 +1,6 @@
 import { userProfile, state } from './state.js';
 import { showToast } from './ui.js';
-import { drawLegs, drawRoute, setStartMarker, setEndMarker } from './map.js';
+import { drawLegs, drawRoute, setStartMarker, setEndMarker, updateAlertCard } from './map.js';
 import { journeyTfL } from './tfl-journey.js';
 import { routeOSRM, fmtDistance, fmtDuration } from './osrm.js';
 
@@ -141,6 +141,11 @@ export const buildRoute = async (destination, mode) => {
         `${duration} min · ${legs.length} leg${legs.length === 1 ? '' : 's'}. ${_modeNote(mode, hasDisruption)}`,
         _legSteps(legs)
       );
+
+      // Update alert card with route-specific disruptions
+      const disruptedLines = legs.filter((l) => l.isDisrupted).map((l) => l.lineName);
+      updateAlertCard(disruptedLines, true);
+
       showToast(`${duration} min · live TfL route drawn.`);
 
     } catch (tflErr) {

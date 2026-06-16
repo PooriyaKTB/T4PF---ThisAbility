@@ -35,7 +35,10 @@ const _create = () => {
   L.tileLayer(OSM_TILE, { attribution: OSM_CREDIT, maxZoom: 19 }).addTo(_map);
   _faultLayer = L.layerGroup().addTo(_map);
 
-  // Non-blocking: fetch live TfL lift faults and overlay red markers
+  // Force tile grid recalculation after the container is fully painted
+  setTimeout(() => _map.invalidateSize({ animate: false }), 100);
+
+  // Non-blocking: fetch live TfL disruptions and update alert card
   _loadFaults();
 };
 
@@ -44,14 +47,47 @@ const _loadFaults = () => {
     .then((faults) => {
       clearFaults();
       faults.forEach(({ name, latlng }) => addFaultMarker(latlng, name));
+
+      // Fault badge
       const badge = document.getElementById('fault-badge');
-      if (!badge) return;
-      if (faults.length === 0) { badge.hidden = true; return; }
-      badge.querySelector('[data-count]').textContent = faults.length;
-      badge.querySelector('[data-plural]').textContent = faults.length === 1 ? '' : 's';
-      badge.removeAttribute('hidden');
+      if (badge) {
+        if (faults.length === 0) { badge.hidden = true; }
+        else {
+          badge.querySelector('[data-count]').textContent = faults.length;
+          badge.querySelector('[data-plural]').textContent = faults.length === 1 ? '' : 's';
+          badge.removeAttribute('hidden');
+        }
+      }
+
+      // Live Obstacle Alert card — show network-wide disruptions
+      updateAlertCard(faults.map((f) => f.name), false);
     })
     .catch(() => {});
+};
+
+/* Updates the Live Obstacle Alert card.
+   `lines`    — array of disrupted line names (e.g. ['Jubilee', 'Piccadilly'])
+   `onRoute`  — true when disruptions are from the user's current route legs */
+export const updateAlertCard = (lines, onRoute = false) => {
+  const body       = document.getElementById('alert-body');
+  const statusChip = document.getElementById('alert-status');
+  if (!body) return;
+
+  if (!lines.length) {
+    body.innerHTML = '<strong>TfL live data:</strong> No service disruptions on monitored lines right now.';
+    if (statusChip) { statusChip.textContent = 'All clear'; statusChip.className = 'chip info'; }
+    return;
+  }
+
+  const lineList = lines.join(', ');
+  body.innerHTML = onRoute
+    ? `<strong>Route disruption:</strong> ${lineList} on your selected route. Step-free alternatives are being prioritised.`
+    : `<strong>TfL live data:</strong> Current disruptions: ${lineList}. Step-free routing will automatically avoid affected services.`;
+
+  if (statusChip) {
+    statusChip.textContent = `${lines.length} disruption${lines.length === 1 ? '' : 's'}`;
+    statusChip.className   = 'chip warning';
+  }
 };
 
 /* Double-rAF: first frame commits CSS class removal to layout engine,
@@ -118,6 +154,8 @@ export const drawLegs = (legs) => {
 
   if (all.length > 1) {
     _map.fitBounds(L.latLngBounds(all), { padding: [24, 24] });
+    // Re-invalidate after bounds change so tiles load at the new zoom level
+    setTimeout(() => _map.invalidateSize({ animate: false }), 100);
   }
 };
 
