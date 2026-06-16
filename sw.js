@@ -1,9 +1,9 @@
-/* ThisAbility Service Worker — v2
+/* ThisAbility Service Worker — v3
    Handles: notification clicks, offline cache for local assets. */
 
 /* JS modules change frequently during development — always fetch from network.
    Only cache static assets (images, CSS) for performance. */
-const ASSET_CACHE = 'ta-v3-assets';
+const ASSET_CACHE = 'ta-v4-assets';
 
 const STATIC_ASSETS = [
   './assets/logo-icon.png',

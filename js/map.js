@@ -35,8 +35,12 @@ const _create = () => {
   L.tileLayer(OSM_TILE, { attribution: OSM_CREDIT, maxZoom: 19 }).addTo(_map);
   _faultLayer = L.layerGroup().addTo(_map);
 
-  // Force tile grid recalculation after the container is fully painted
-  setTimeout(() => _map.invalidateSize({ animate: false }), 100);
+  // Force tile grid recalculation after the container is fully painted.
+  // setView (not just invalidateSize) makes Leaflet recalculate tile coords from scratch.
+  setTimeout(() => {
+    _map.invalidateSize({ animate: false });
+    _map.setView(LONDON, 13, { animate: false });
+  }, 150);
 
   // Non-blocking: fetch live TfL disruptions and update alert card
   _loadFaults();
@@ -65,24 +69,57 @@ const _loadFaults = () => {
     .catch(() => {});
 };
 
-/* Updates the Live Obstacle Alert card.
-   `lines`    — array of disrupted line names (e.g. ['Jubilee', 'Piccadilly'])
-   `onRoute`  — true when disruptions are from the user's current route legs */
+/* Updates the Live Obstacle Alert card with one verify-able row per disrupted line.
+   `lines`   — array of disrupted line names (e.g. ['Jubilee', 'Piccadilly'])
+   `onRoute` — true when disruptions come from the user's selected route legs */
 export const updateAlertCard = (lines, onRoute = false) => {
   const body       = document.getElementById('alert-body');
   const statusChip = document.getElementById('alert-status');
   if (!body) return;
 
   if (!lines.length) {
-    body.innerHTML = '<strong>TfL live data:</strong> No service disruptions on monitored lines right now.';
+    body.innerHTML = '<p class="muted" style="margin:0">No service disruptions on monitored lines right now.</p>';
     if (statusChip) { statusChip.textContent = 'All clear'; statusChip.className = 'chip info'; }
     return;
   }
 
-  const lineList = lines.join(', ');
-  body.innerHTML = onRoute
-    ? `<strong>Route disruption:</strong> ${lineList} on your selected route. Step-free alternatives are being prioritised.`
-    : `<strong>TfL live data:</strong> Current disruptions: ${lineList}. Step-free routing will automatically avoid affected services.`;
+  body.innerHTML = lines.map((name) => `
+    <div class="disruption-row" data-line="${name}">
+      <span class="disruption-info">
+        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+        <span><strong>${name}</strong> — ${onRoute ? 'on your route' : 'reduced service'}</span>
+      </span>
+      <span class="disruption-row-actions">
+        <button class="disruption-verify-btn" aria-label="Verify ${name} disruption">Verify</button>
+        <button class="disruption-avoid-btn"  aria-label="Avoid ${name}">Avoid</button>
+      </span>
+    </div>`).join('');
+
+  const _markVerified = (btn) => {
+    btn.textContent = 'Verified ✓';
+    btn.classList.add('verified');
+    btn.disabled = true;
+  };
+  const _markAvoided = (btn) => {
+    btn.textContent = 'Avoided ✓';
+    btn.classList.add('avoided');
+    btn.disabled = true;
+  };
+
+  body.querySelectorAll('.disruption-verify-btn').forEach((btn) => btn.addEventListener('click', () => _markVerified(btn)));
+  body.querySelectorAll('.disruption-avoid-btn').forEach((btn)  => btn.addEventListener('click', () => _markAvoided(btn)));
+
+  // Bulk buttons
+  const avoidAllBtn  = document.getElementById('avoid-all-btn');
+  const verifyAllBtn = document.getElementById('verify-all-btn');
+  if (avoidAllBtn) {
+    avoidAllBtn.onclick = () =>
+      body.querySelectorAll('.disruption-avoid-btn:not(:disabled)').forEach(_markAvoided);
+  }
+  if (verifyAllBtn) {
+    verifyAllBtn.onclick = () =>
+      body.querySelectorAll('.disruption-verify-btn:not(:disabled)').forEach(_markVerified);
+  }
 
   if (statusChip) {
     statusChip.textContent = `${lines.length} disruption${lines.length === 1 ? '' : 's'}`;

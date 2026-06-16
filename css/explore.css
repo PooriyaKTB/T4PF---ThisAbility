@@ -102,8 +102,14 @@
 }
 
 #leaflet-map {
-  height: 100%;
+  height: 210px; /* explicit px — 100% can resolve to 0 before Leaflet measures the container */
   width: 100%;
+}
+
+/* Undo the global box-sizing reset for all Leaflet internals */
+.leaflet-container,
+.leaflet-container * {
+  box-sizing: content-box;
 }
 
 .fault-badge {
@@ -214,4 +220,84 @@
 
 .module-detail.visible {
   display: block;
+}
+
+/* ── Live Obstacle Alert — per-disruption rows ─── */
+.disruption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  animation: screenFadeIn 0.22s ease;
+}
+
+.disruption-row:last-child {
+  border-bottom: none;
+}
+
+.disruption-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--text-main);
+  flex: 1;
+  min-width: 0;
+}
+
+.disruption-info i {
+  color: var(--warning);
+  flex-shrink: 0;
+}
+
+.disruption-info span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.disruption-row-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.disruption-verify-btn,
+.disruption-avoid-btn {
+  cursor: pointer;
+  border: none;
+  font-size: 0.68rem;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.disruption-verify-btn {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.disruption-verify-btn:hover:not(:disabled) { background: #fde68a; }
+
+.disruption-verify-btn.verified {
+  background: #d1fae5;
+  color: #065f46;
+  cursor: default;
+}
+
+.disruption-avoid-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.disruption-avoid-btn:hover:not(:disabled) { background: #fecaca; }
+
+.disruption-avoid-btn.avoided {
+  background: #e0e7ff;
+  color: #3730a3;
+  cursor: default;
 }
