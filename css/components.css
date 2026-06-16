@@ -170,7 +170,7 @@
 
 .chip.warning {
   background: #fffbeb;
-  color: var(--warning);
+  color: #92400e; /* darker amber — 7.7:1 on #fffbeb, passes WCAG AA */
 }
 
 .chip.info {

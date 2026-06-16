@@ -3,11 +3,12 @@
 
 /* JS modules change frequently during development — always fetch from network.
    Only cache static assets (images, CSS) for performance. */
-const ASSET_CACHE = 'ta-v4-assets';
+const ASSET_CACHE = 'ta-v5-assets';
 
 const STATIC_ASSETS = [
   './assets/logo-icon.png',
   './assets/logo-full.png',
+  './index.html', // cached as offline fallback
 ];
 
 self.addEventListener('install', (e) => {
@@ -33,9 +34,13 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== self.location.origin) return; // skip external APIs + OSM tiles
   if (e.request.method !== 'GET') return;
 
-  // JS and HTML: always network-first (never serve stale code)
+  // JS and HTML: network-first; fall back to cache when offline
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.html') || url.pathname === '/') {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    e.respondWith(
+      fetch(e.request).catch(() =>
+        caches.match(e.request).then((cached) => cached || caches.match('./index.html'))
+      )
+    );
     return;
   }
 

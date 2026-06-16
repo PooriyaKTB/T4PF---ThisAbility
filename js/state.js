@@ -61,7 +61,6 @@ export const state = {
 
 export const screenCopy = {
   explore: {
-    heading: '',
     subtitle: 'Plan a safer journey with live accessibility intelligence.',
   },
   passport: {
@@ -73,7 +72,6 @@ export const screenCopy = {
     subtitle: '24/7 safety monitoring linked to your route and access profile.',
   },
   settings: {
-    heading: '',
     subtitle: 'Manage your access needs, privacy consent, and app preferences.',
   },
 };
