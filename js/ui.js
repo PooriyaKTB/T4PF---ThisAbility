@@ -1,4 +1,5 @@
 import { userProfile, state, screenCopy } from './state.js';
+import { refreshMap } from './map.js';
 
 const phoneFrame = document.getElementById('phone-frame');
 const toast      = document.getElementById('toast');
@@ -94,6 +95,7 @@ export const setScreen = (screenName) => {
         : screenCopy[screenName].heading;
   document.getElementById('screen-subtitle').textContent = screenCopy[screenName].subtitle;
   content.scrollTop = 0;
+  if (screenName === 'explore') refreshMap();
 };
 
 export const unlockDemo = (message) => {
@@ -101,10 +103,12 @@ export const unlockDemo = (message) => {
   setScreen('explore');
   updateProfileUi();
   showToast(message);
+  refreshMap();
 };
 
 export const silentUnlock = () => {
   phoneFrame.classList.remove('demo-locked');
   setScreen('explore');
   updateProfileUi();
+  refreshMap();
 };

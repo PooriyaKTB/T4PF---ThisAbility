@@ -1,6 +1,7 @@
 import { userProfile, state, moduleContent } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
+import { initMap } from '../map.js';
 
 const surroundAlertsData = [
   { icon: 'fa-arrow-down', color: 'var(--warning)', label: 'Kerb drop',      text: 'Steep kerb drop in 14m — haptic alert queued for your profile.' },
@@ -9,6 +10,8 @@ const surroundAlertsData = [
 ];
 
 export const init = () => {
+  initMap();
+
   const destinationInput = document.getElementById('destination');
   const routeState       = document.getElementById('route-state');
   const alertStatus      = document.getElementById('alert-status');

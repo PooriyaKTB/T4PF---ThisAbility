@@ -38,77 +38,15 @@
 
 .route-map {
   overflow: hidden;
-  min-height: 170px;
+  height: 210px;
   position: relative;
-  background:
-    linear-gradient(90deg, rgba(37, 99, 235, 0.12) 1px, transparent 1px),
-    linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px),
-    #f8fbff;
-  background-size: 42px 42px;
   margin-bottom: 14px;
+  background: #e8edf2;
 }
 
-.route-line {
-  position: absolute;
-  left: 34px;
-  top: 114px;
-  width: calc(100% - 68px);
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  border-radius: 999px;
-  transform: rotate(-12deg);
-  transform-origin: left center;
-}
-
-.route-line::before,
-.route-line::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  transform: translateY(-50%);
-  background: white;
-  border: 5px solid var(--primary);
-}
-
-.route-line::before {
-  left: -4px;
-}
-
-.route-line::after {
-  right: -4px;
-  border-color: var(--secondary);
-}
-
-.map-tag {
-  position: absolute;
-  border-radius: 999px;
-  padding: 6px 9px;
-  background: white;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
-  font-size: 0.7rem;
-  font-weight: 800;
-}
-
-.tag-start {
-  left: 8px;
-  bottom: 10px;
-}
-
-.tag-end {
-  right: 8px;
-  top: 10px;
-}
-
-.tag-alert {
-  left: 50%;
-  top: 10px;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  max-width: calc(100% - 16px);
+#leaflet-map {
+  height: 100%;
+  width: 100%;
 }
 
 .route-result {

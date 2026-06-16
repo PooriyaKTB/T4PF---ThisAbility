@@ -8,6 +8,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
@@ -157,14 +158,13 @@
             </div>
           </form>
 
-          <div class="route-map" aria-label="Illustrated accessible route map">
-            <div class="route-line"></div>
-            <span class="map-tag tag-start" id="map-start">London Bridge Station</span>
-            <span class="map-tag tag-alert" id="map-alert-tag" style="color:var(--danger);">
-              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> lift outage
-            </span>
-            <span class="map-tag tag-end" id="map-destination">Waterloo</span>
+          <div class="route-map" aria-label="Accessible route map">
+            <div id="leaflet-map"></div>
           </div>
+          <!-- Hidden label refs kept for routing.js — wired to Leaflet markers in Step 6 -->
+          <span id="map-start"     class="sr-only">London Bridge Station</span>
+          <span id="map-alert-tag" class="sr-only"></span>
+          <span id="map-destination" class="sr-only">Waterloo</span>
 
           <div class="card alert-box" id="alert-card">
             <div class="alert-header">
@@ -593,6 +593,7 @@
       </nav>
     </main>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPeE=" crossorigin=""></script>
     <script type="module" src="js/main.js"></script>
   </body>
 </html>
