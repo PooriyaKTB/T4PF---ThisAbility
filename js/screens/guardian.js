@@ -1,7 +1,9 @@
 import { userProfile } from '../state.js';
 import { showToast } from '../ui.js';
+import { isSupported, requestPermission, startDetector, stopDetector } from '../falldetector.js';
 
-const runGuardianSim = (type) => {
+/* source: 'test' (button) | 'sensor' (real DeviceMotion) */
+const runGuardianSim = (type, source = 'test') => {
   if (!document.getElementById('guardian-toggle').classList.contains('on')) {
     showToast('Guardian is paused. Re-enable it to run simulations.');
     return;
@@ -11,14 +13,23 @@ const runGuardianSim = (type) => {
   resultEl.innerHTML = '';
   const contact = userProfile.guardian || 'your emergency contact';
 
+  if (source === 'sensor') {
+    const banner = document.createElement('div');
+    banner.className = 'scan-alert-item fall-sensor-banner';
+    banner.innerHTML = '<i class="fas fa-circle-exclamation" aria-hidden="true"></i> <strong>REAL FALL DETECTED — sensor triggered</strong>';
+    resultEl.appendChild(banner);
+  }
+
   const scenarios = {
     fall: {
       color: 'var(--danger)',
       steps: [
-        { delay: 0,    icon: 'fa-circle-exclamation', msg: 'Sudden impact detected by gyroscope — possible fall or tip-over.' },
+        { delay: 0,    icon: 'fa-circle-exclamation', msg: source === 'sensor'
+            ? 'DeviceMotion: impact event confirmed — free-fall + impact sequence detected.'
+            : 'Sudden impact detected by gyroscope — possible fall or tip-over.' },
         { delay: 1400, icon: 'fa-map-pin',            msg: 'Compiling GPS location, current route, and access profile…' },
         { delay: 2800, icon: 'fa-user-shield',        msg: `Alerting ${contact} — 30-second cancel window active.` },
-        { delay: 4200, icon: 'fa-check-circle',       msg: 'Fall alert chain complete. Responder has route context.' },
+        { delay: 4200, icon: 'fa-check-circle',       msg: 'Fall alert chain complete. Responder has full route context.' },
       ],
     },
     anxiety: {
@@ -33,7 +44,7 @@ const runGuardianSim = (type) => {
     panic: {
       color: '#7c3aed',
       steps: [
-        { delay: 0,    icon: 'fa-heart-pulse',  msg: 'Medical episode / SOS triggered by user.' },
+        { delay: 0,    icon: 'fa-heart-pulse',  msg: 'Medical episode / SOS triggered.' },
         { delay: 1400, icon: 'fa-shield',       msg: 'Sending encrypted medical note and location to emergency services…' },
         { delay: 2800, icon: 'fa-user-shield',  msg: `${contact} and emergency services receiving your access and allergy profile.` },
         { delay: 4200, icon: 'fa-check-circle', msg: 'SOS chain complete. Responders have full context.' },
@@ -53,19 +64,84 @@ const runGuardianSim = (type) => {
       item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, delay);
   });
-  setTimeout(() => { document.getElementById('route-state').textContent = 'SOS ready'; }, 4200);
+
+  setTimeout(() => {
+    const routeStateEl = document.getElementById('route-state');
+    if (routeStateEl) routeStateEl.textContent = 'SOS ready';
+  }, 4200);
+};
+
+const _updateSensorChip = (chip, state) => {
+  const labels = {
+    armed:    { text: 'Sensor armed',    cls: 'sensor-chip sensor-on'  },
+    manual:   { text: 'Manual only',     cls: 'sensor-chip sensor-off' },
+    inactive: { text: 'Sensor inactive', cls: 'sensor-chip sensor-off' },
+    tap:      { text: 'Tap to arm sensor', cls: 'sensor-chip sensor-tap' },
+  };
+  const { text, cls } = labels[state] || labels.inactive;
+  chip.textContent = text;
+  chip.className   = cls;
 };
 
 export const init = () => {
-  const guardianState = document.getElementById('guardian-state');
+  const toggleEl  = document.getElementById('guardian-toggle');
+  const stateEl   = document.getElementById('guardian-state');
 
-  document.getElementById('guardian-toggle').addEventListener('click', () => {
-    const isOn = document.getElementById('guardian-toggle').classList.contains('on');
-    guardianState.textContent = isOn ? 'Armed' : 'Paused';
-    showToast(isOn
-      ? 'Guardian armed. Fall detection is active.'
-      : 'Guardian paused. Re-enable for continuous safety monitoring.');
+  // Inject a small sensor-status chip into the metrics grid
+  const sensorChip = document.createElement('div');
+  sensorChip.className = 'sensor-chip sensor-off';
+  sensorChip.textContent = 'Sensor inactive';
+  sensorChip.setAttribute('aria-live', 'polite');
+  const metricsGrid = toggleEl.closest('.card')?.nextElementSibling;
+  if (metricsGrid?.classList.contains('metrics-grid')) {
+    metricsGrid.appendChild(sensorChip);
+  }
+
+  const _onFall = () => runGuardianSim('fall', 'sensor');
+
+  const _armSensor = async (fromGesture = false) => {
+    if (!isSupported()) {
+      _updateSensorChip(sensorChip, 'manual');
+      return;
+    }
+    try {
+      if (fromGesture) await requestPermission();
+      startDetector(_onFall);
+      _updateSensorChip(sensorChip, 'armed');
+      stateEl.textContent = 'Armed + sensing';
+    } catch (err) {
+      if (err.message === 'denied') {
+        showToast('Motion sensor denied — using manual simulation only.');
+        _updateSensorChip(sensorChip, 'manual');
+      } else {
+        // iOS without a user gesture — prompt user to tap toggle
+        _updateSensorChip(sensorChip, 'tap');
+      }
+    }
+  };
+
+  const _disarmSensor = () => {
+    stopDetector();
+    _updateSensorChip(sensorChip, 'inactive');
+  };
+
+  /* Guardian toggle — MUST be a user gesture so iOS permission can fire */
+  toggleEl.addEventListener('click', async () => {
+    const isOn = toggleEl.classList.contains('on');
+    if (isOn) {
+      await _armSensor(true);
+      showToast('Guardian armed. Fall detection active.');
+    } else {
+      _disarmSensor();
+      stateEl.textContent = 'Paused';
+      showToast('Guardian paused. Re-enable for continuous safety monitoring.');
+    }
   });
+
+  /* Auto-arm on Android/desktop (no permission gate) when guardian starts ON */
+  if (toggleEl.classList.contains('on')) {
+    _armSensor(false); // will silently no-op / show 'tap' on iOS
+  }
 
   document.getElementById('fall-test').addEventListener('click',    () => runGuardianSim('fall'));
   document.getElementById('anxiety-test').addEventListener('click', () => runGuardianSim('anxiety'));
