@@ -75,7 +75,8 @@
 }
 
 .ac-item:hover,
-.ac-item.active { background: var(--surface-soft); }
+.ac-item.active,
+.ac-item:focus-visible { background: var(--surface-soft); outline: 2px solid var(--primary); outline-offset: -2px; }
 
 .routing-input i {
   color: var(--primary);

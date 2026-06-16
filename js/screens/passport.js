@@ -6,7 +6,9 @@ export const init = () => {
   const bleTitle = document.getElementById('ble-title');
 
   document.getElementById('ble-toggle').addEventListener('click', () => {
-    const isOn = document.getElementById('ble-toggle').classList.contains('on');
+    const toggleEl = document.getElementById('ble-toggle');
+    const isOn = toggleEl.classList.contains('on');
+    toggleEl.setAttribute('aria-pressed', String(isOn));
     bleOrb.classList.toggle('paused', !isOn);
     bleTitle.textContent = isOn ? 'CapAble ID Broadcasting' : 'CapAble ID Paused';
     showToast(isOn

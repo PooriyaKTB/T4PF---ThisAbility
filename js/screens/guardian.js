@@ -173,6 +173,7 @@ export const init = () => {
   /* Guardian toggle — MUST be a user gesture so iOS permission can fire */
   toggleEl.addEventListener('click', async () => {
     const isOn = toggleEl.classList.contains('on');
+    toggleEl.setAttribute('aria-pressed', String(isOn));
     if (isOn) {
       await _armSensor(true);
       showToast('Guardian armed. Fall detection active.');

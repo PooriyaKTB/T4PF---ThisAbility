@@ -41,7 +41,11 @@ export const createAutocomplete = (inputEl, onSelect) => {
   let _ul    = null;
 
   const close = () => {
-    _ul?.remove();
+    if (_ul) {
+      _ul.remove();
+      inputEl.removeAttribute('aria-controls');
+      inputEl.setAttribute('aria-autocomplete', 'none');
+    }
     _ul = null; _idx = -1; _items = [];
   };
 
