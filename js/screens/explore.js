@@ -1,7 +1,8 @@
 import { userProfile, state, moduleContent } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, centreOn } from '../map.js';
+import { setStartMarker, setEndMarker, centreOn } from '../map.js';
+import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
   { icon: 'fa-arrow-down', color: 'var(--warning)', label: 'Kerb drop',      text: 'Steep kerb drop in 14m — haptic alert queued for your profile.' },
@@ -131,6 +132,25 @@ export const init = () => {
       showToast(`${module.title} selected.`);
     });
   });
+
+  /* ── Address autocomplete (Nominatim) ───────────── */
+  createAutocomplete(
+    document.getElementById('current-location'),
+    (label, lat, lng) => {
+      updateMapStart(label);
+      setStartMarker([lat, lng], label);
+      centreOn([lat, lng], 15);
+    }
+  );
+
+  createAutocomplete(
+    document.getElementById('destination'),
+    (label, lat, lng) => {
+      updateMapEnd(label);
+      updateMapAlert(state.selectedMode, label);
+      setEndMarker([lat, lng], label);
+    }
+  );
 
   document.getElementById('surround-scan-btn').addEventListener('click', () => {
     const list = document.getElementById('surround-alerts-list');
