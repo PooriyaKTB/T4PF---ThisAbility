@@ -1,6 +1,7 @@
 import { userProfile } from '../state.js';
 import { showToast } from '../ui.js';
 import { isSupported, requestPermission, startDetector, stopDetector } from '../falldetector.js';
+import { requestPermission as requestNotifPerm, showNotification } from '../notify.js';
 
 /* source: 'test' (button) | 'sensor' (real DeviceMotion) */
 const runGuardianSim = (type, source = 'test') => {
@@ -20,9 +21,32 @@ const runGuardianSim = (type, source = 'test') => {
     resultEl.appendChild(banner);
   }
 
+  const notifConfig = {
+    fall: {
+      title:   `⚠ Fall Alert — EquiVerse`,
+      body:    `Guardian is alerting ${contact}. Tap to open or cancel.`,
+      tag:     'ta-fall',
+      actions: [{ action: 'cancel', title: 'Cancel alert' }, { action: 'open', title: 'Open app' }],
+    },
+    anxiety: {
+      title:   `🧠 Sensory Alert — EquiVerse`,
+      body:    `Overload pattern detected. Soft check-in sent to ${contact}.`,
+      tag:     'ta-anxiety',
+      actions: [{ action: 'cancel', title: 'I\'m OK' }, { action: 'open', title: 'Open app' }],
+    },
+    panic: {
+      title:   `🆘 SOS — EquiVerse`,
+      body:    `Medical episode triggered. Emergency chain active for ${contact}.`,
+      tag:     'ta-panic',
+      requireInteraction: true,
+      actions: [{ action: 'open', title: 'Open app' }],
+    },
+  };
+
   const scenarios = {
     fall: {
       color: 'var(--danger)',
+      notifDelay: 2800,
       steps: [
         { delay: 0,    icon: 'fa-circle-exclamation', msg: source === 'sensor'
             ? 'DeviceMotion: impact event confirmed — free-fall + impact sequence detected.'
@@ -34,6 +58,7 @@ const runGuardianSim = (type, source = 'test') => {
     },
     anxiety: {
       color: 'var(--warning)',
+      notifDelay: 2800,
       steps: [
         { delay: 0,    icon: 'fa-brain',        msg: 'Sensory overload pattern detected — repeated distress gesture recognised.' },
         { delay: 1400, icon: 'fa-route',        msg: 'Identifying quieter route alternative with lower sensory load…' },
@@ -43,6 +68,7 @@ const runGuardianSim = (type, source = 'test') => {
     },
     panic: {
       color: '#7c3aed',
+      notifDelay: 0,
       steps: [
         { delay: 0,    icon: 'fa-heart-pulse',  msg: 'Medical episode / SOS triggered.' },
         { delay: 1400, icon: 'fa-shield',       msg: 'Sending encrypted medical note and location to emergency services…' },
@@ -52,7 +78,8 @@ const runGuardianSim = (type, source = 'test') => {
     },
   };
 
-  const { steps, color } = scenarios[type];
+  const { steps, color, notifDelay } = scenarios[type];
+
   steps.forEach(({ delay, icon, msg }) => {
     setTimeout(() => {
       showToast(msg);
@@ -64,6 +91,16 @@ const runGuardianSim = (type, source = 'test') => {
       item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, delay);
   });
+
+  // Fire a system notification at the appropriate point in the chain
+  setTimeout(() => {
+    const nc = notifConfig[type];
+    showNotification(nc.title, nc.body, {
+      tag:               nc.tag,
+      actions:           nc.actions,
+      requireInteraction: nc.requireInteraction ?? (type !== 'anxiety'),
+    });
+  }, notifDelay);
 
   setTimeout(() => {
     const routeStateEl = document.getElementById('route-state');
@@ -100,12 +137,20 @@ export const init = () => {
   const _onFall = () => runGuardianSim('fall', 'sensor');
 
   const _armSensor = async (fromGesture = false) => {
+    // Request notification permission alongside sensor arming (must be user gesture)
+    if (fromGesture) {
+      const perm = await requestNotifPerm();
+      if (perm === 'granted') {
+        showToast('Guardian notifications enabled.');
+      }
+    }
+
     if (!isSupported()) {
       _updateSensorChip(sensorChip, 'manual');
       return;
     }
     try {
-      if (fromGesture) await requestPermission();
+      if (fromGesture) await requestPermission(); // DeviceMotion permission (iOS)
       startDetector(_onFall);
       _updateSensorChip(sensorChip, 'armed');
       stateEl.textContent = 'Armed + sensing';
