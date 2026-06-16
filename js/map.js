@@ -1,3 +1,5 @@
+import { fetchLiftFaults } from './tfl.js';
+
 const LONDON = [51.5074, -0.1278];
 
 let _map         = null;
@@ -31,6 +33,24 @@ const _create = () => {
 
   L.tileLayer(OSM_TILE, { attribution: OSM_CREDIT, maxZoom: 19 }).addTo(_map);
   _faultLayer = L.layerGroup().addTo(_map);
+
+  // Non-blocking: fetch live TfL lift faults and overlay red markers
+  _loadFaults();
+};
+
+const _loadFaults = () => {
+  fetchLiftFaults()
+    .then((faults) => {
+      clearFaults();
+      faults.forEach(({ name, latlng }) => addFaultMarker(latlng, name));
+      const badge = document.getElementById('fault-badge');
+      if (!badge) return;
+      if (faults.length === 0) { badge.hidden = true; return; }
+      badge.querySelector('[data-count]').textContent = faults.length;
+      badge.querySelector('[data-plural]').textContent = faults.length === 1 ? '' : 's';
+      badge.hidden = false;
+    })
+    .catch(() => {});
 };
 
 /* Double-rAF: first frame commits CSS class removal to layout engine,

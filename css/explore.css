@@ -49,6 +49,32 @@
   width: 100%;
 }
 
+.fault-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: rgba(239, 68, 68, 0.92);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.fault-badge[hidden] {
+  display: none;
+}
+
+.fault-badge i {
+  font-size: 0.65rem;
+}
+
 .route-result {
   display: none;
   border-top: 1px solid var(--border);

@@ -160,6 +160,10 @@
 
           <div class="route-map" aria-label="Accessible route map">
             <div id="leaflet-map"></div>
+            <div id="fault-badge" class="fault-badge" hidden aria-live="polite">
+              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+              <span data-count>0</span> lift fault<span data-plural>s</span> live
+            </div>
           </div>
           <!-- Hidden label refs kept for routing.js — wired to Leaflet markers in Step 6 -->
           <span id="map-start"     class="sr-only">London Bridge Station</span>
