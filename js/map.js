@@ -6,6 +6,7 @@ let _map         = null;
 let _startMarker = null;
 let _endMarker   = null;
 let _routeLine   = null;
+let _legLines    = [];   // multi-leg lines from TfL Journey Planner
 let _faultLayer  = null;
 
 const OSM_TILE   = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -48,7 +49,7 @@ const _loadFaults = () => {
       if (faults.length === 0) { badge.hidden = true; return; }
       badge.querySelector('[data-count]').textContent = faults.length;
       badge.querySelector('[data-plural]').textContent = faults.length === 1 ? '' : 's';
-      badge.hidden = false;
+      badge.removeAttribute('hidden');
     })
     .catch(() => {});
 };
@@ -93,7 +94,36 @@ export const drawRoute = (latlngs, colour = '#2563eb') => {
   _map.fitBounds(_routeLine.getBounds(), { padding: [24, 24] });
 };
 
+/* Draw multiple coloured legs (TfL Journey Planner output).
+   Walking legs are rendered as dashed grey lines; transit legs as solid coloured lines. */
+export const drawLegs = (legs) => {
+  if (!_map) return;
+  _legLines.forEach((l) => l.remove());
+  _legLines = [];
+  if (_routeLine) { _routeLine.remove(); _routeLine = null; }
+
+  const all = [];
+  legs.forEach(({ latlngs, colour, dashed }) => {
+    if (!latlngs?.length) return;
+    const line = L.polyline(latlngs, {
+      color:     colour,
+      weight:    dashed ? 3 : 5,
+      opacity:   dashed ? 0.65 : 0.90,
+      dashArray: dashed ? '8 8' : null,
+      lineJoin:  'round',
+    }).addTo(_map);
+    _legLines.push(line);
+    all.push(...latlngs);
+  });
+
+  if (all.length > 1) {
+    _map.fitBounds(L.latLngBounds(all), { padding: [24, 24] });
+  }
+};
+
 export const clearRoute = () => {
+  _legLines.forEach((l) => l.remove());
+  _legLines = [];
   if (_routeLine)   { _routeLine.remove();   _routeLine   = null; }
   if (_startMarker) { _startMarker.remove(); _startMarker = null; }
   if (_endMarker)   { _endMarker.remove();   _endMarker   = null; }
@@ -105,7 +135,7 @@ export const clearFaults = () => { if (_faultLayer) _faultLayer.clearLayers(); }
 export const addFaultMarker = (latlng, name) => {
   if (!_faultLayer) return;
   L.circleMarker(latlng, FAULT_STYLE)
-    .bindPopup(`<strong>⚠ Lift / escalator fault</strong><br>${name}`)
+    .bindPopup(`<strong>⚠ Service disruption</strong><br>${name}`)
     .addTo(_faultLayer);
 };
 
