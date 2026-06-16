@@ -1,5 +1,21 @@
 import { userProfile, state } from './state.js';
 import { showToast } from './ui.js';
+import { drawRoute, setStartMarker, setEndMarker } from './map.js';
+import { routeOSRM, fmtDistance, fmtDuration } from './osrm.js';
+
+const NOM = 'https://nominatim.openstreetmap.org/search';
+
+const _geocode = async (query) => {
+  const p = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'gb' });
+  const res = await fetch(`${NOM}?${p}`, {
+    headers: { 'Accept-Language': 'en-GB' },
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error(res.status);
+  const data = await res.json();
+  if (!data.length) throw new Error(`No geocode result for "${query}"`);
+  return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+};
 
 export const getMapAlertData = (mode, dest) => {
   const d = (dest || '').toLowerCase();
@@ -46,54 +62,101 @@ export const updateMapEnd = (val) => {
   }
 };
 
-export const buildRoute = (destination, mode) => {
-  const dest  = destination.trim() || 'Waterloo';
-  const from  = document.getElementById('current-location')?.value.trim() || 'London Bridge';
-  const isAI  = mode === 'AI Agent';
-  const mins  = isAI ? 24 : mode === 'Fastest' ? 21 : mode === 'Quiet' ? 29 : 26;
-  const conf  = dest.toLowerCase().includes('waterloo') ? 'High confidence' : 'Medium confidence';
-  const via   = dest.toLowerCase().includes('waterloo') ? 'Southwark' : 'a verified step-free stop';
-  const alert = userProfile.alert === 'Audio + visual'
+const _accessibilitySteps = (from, dest, mode, alertType) => {
+  const isAI    = mode === 'AI Agent';
+  const alert   = userProfile.alert === 'Audio + visual'
     ? 'Audio and visual alerts enabled'
     : `${userProfile.alert} alerts enabled`;
+
+  if (isAI) return [
+    ['fa-robot',          `AI Agent: barrier-free path identified from ${from} using live data.`],
+    ['fa-train',          `Step-free transport selected based on your ${userProfile.disability || 'access'} profile and live crowd data.`],
+    ['fa-brain',          `Sensory load alert pre-queued for the route — ${userProfile.sensory} mode active.`],
+    ['fa-id-card',        `CapAble ID ready to broadcast your access hints to venues along the route.`],
+    ['fa-flag-checkered', `Arrive at ${dest}. Guardian monitoring remains active.`],
+  ];
+
+  return [
+    ['fa-train',          `Step-free transport toward ${dest} — ${alertType.text}.`],
+    ['fa-wheelchair',     `${userProfile.mobility} preference applied; ramp and lift priority routing active.`],
+    ['fa-bell',           `${alert} before congested areas on your route.`],
+    ['fa-flag-checkered', `Arrive at ${dest} with CapAble ID ready to share your access profile.`],
+  ];
+};
+
+/* Builds a route: resolves coordinates (from stored state or Nominatim geocode),
+   calls OSRM for a real walking polyline, then updates the route result panel.
+   Falls back to a static narrative if OSRM is unreachable. */
+export const buildRoute = async (destination, mode) => {
+  const dest = destination.trim() || 'Waterloo';
+  const from = document.getElementById('current-location')?.value.trim() || 'London Bridge';
+  const isAI = mode === 'AI Agent';
 
   updateMapStart(from);
   updateMapAlert(mode, dest);
   updateMapEnd(dest);
 
+  try {
+    // Resolve coordinates — use autocomplete/GPS selection if available, else geocode
+    const startLL = state.routeStart ?? await _geocode(from);
+    const endLL   = state.routeEnd   ?? await _geocode(dest);
+
+    const { latlngs, distanceM, durationS } = await routeOSRM(startLL, endLL);
+
+    drawRoute(latlngs, isAI ? '#7c3aed' : '#2563eb');
+    setStartMarker(startLL, from);
+    setEndMarker(endLL, dest);
+
+    const dist = fmtDistance(distanceM);
+    const dur  = fmtDuration(durationS);
+    const alertData = getMapAlertData(mode, dest);
+
+    document.getElementById('route-title').textContent = isAI
+      ? `AI-optimised route to ${dest}`
+      : `${mode} route to ${dest}`;
+
+    document.getElementById('route-summary').textContent = `${dur} · ${dist}. `
+      + (isAI
+        ? `AI Agent applied your ${userProfile.disability || 'mobility'} profile, live TfL status, and crowd telemetry.`
+        : `${userProfile.mobility} preference applied — ${userProfile.sensory.toLowerCase()} guidance active.`);
+
+    document.getElementById('route-steps').innerHTML = _accessibilitySteps(from, dest, mode, alertData)
+      .map(([icon, text]) => `<li>
+        <span class="step-icon"><i class="fas ${icon}" aria-hidden="true"></i></span>
+        <span>${text}</span>
+      </li>`).join('');
+
+    document.getElementById('route-result').classList.add('visible');
+    document.getElementById('route-state').textContent = 'Route set';
+    showToast(`${dur} · ${dist} — live route drawn.`);
+
+  } catch (_err) {
+    // OSRM unreachable or no geocode result — show a static narrative fallback
+    _staticFallback(from, dest, mode);
+  }
+};
+
+const _staticFallback = (from, dest, mode) => {
+  const isAI  = mode === 'AI Agent';
+  const mins  = isAI ? 24 : mode === 'Fastest' ? 21 : mode === 'Quiet' ? 29 : 26;
+  const alertData = getMapAlertData(mode, dest);
+
   document.getElementById('route-title').textContent = isAI
     ? `AI-optimised route to ${dest}`
     : `${mode} route to ${dest}`;
 
-  document.getElementById('route-summary').textContent = isAI
-    ? `${mins} min journey. AI Agent analysed your ${userProfile.disability || 'mobility'} profile, live TfL data, and crowd telemetry. ${conf}. ${alert}.`
-    : `${mins} min journey. ${conf}: ${userProfile.mobility.toLowerCase()} preference applied, ${userProfile.sensory.toLowerCase()} guidance active, and crowd reports checked.`;
+  document.getElementById('route-summary').textContent = `~${mins} min journey. `
+    + (isAI
+      ? `AI Agent applied your ${userProfile.disability || 'mobility'} profile and live data.`
+      : `${userProfile.mobility} preference applied, ${userProfile.sensory.toLowerCase()} guidance active.`);
 
-  const steps = isAI
-    ? [
-        ['fa-robot',          `AI Agent: Barrier-free path identified from ${from} using live sensor data.`],
-        ['fa-train',          `Take Jubilee Line toward ${via} (step-free, 68% crowd forecast: low).`],
-        ['fa-brain',          `Sensory load alert pre-queued for Waterloo concourse — ${userProfile.sensory} mode.`],
-        ['fa-id-card',        `CapAble ID ready to broadcast ${userProfile.disability || 'access'} hints to venue.`],
-        ['fa-flag-checkered', `Arrive at ${dest}. Guardian monitoring active.`],
-      ]
-    : [
-        ['fa-train',          `Take Jubilee Line toward ${via}.`],
-        ['fa-wheelchair',     'Use step-free interchange; avoid the reported Waterloo lift.'],
-        ['fa-bell',           `${alert} before the station concourse.`],
-        ['fa-flag-checkered', `Arrive at ${dest} with CapAble ID ready.`],
-      ];
-
-  document.getElementById('route-steps').innerHTML = steps
+  document.getElementById('route-steps').innerHTML = _accessibilitySteps(from, dest, mode, alertData)
     .map(([icon, text]) => `<li>
       <span class="step-icon"><i class="fas ${icon}" aria-hidden="true"></i></span>
       <span>${text}</span>
-    </li>`)
-    .join('');
+    </li>`).join('');
 
   document.getElementById('route-result').classList.add('visible');
   document.getElementById('route-state').textContent = 'Route set';
-  showToast(isAI
-    ? 'AI Agent route ready — personalised to your profile.'
-    : 'Safe route prepared with barrier-aware routing.');
+  showToast('Live routing unavailable — showing estimated accessibility route.');
 };

@@ -31,6 +31,7 @@ export const init = () => {
 
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude: lat, longitude: lng } }) => {
+        state.routeStart = [lat, lng];
         centreOn([lat, lng], 16);
         setStartMarker([lat, lng], 'Your location');
 
@@ -70,10 +71,12 @@ export const init = () => {
   });
 
   document.getElementById('current-location').addEventListener('input', (e) => {
+    state.routeStart = null; // clear stored coords when user edits manually
     updateMapStart(e.target.value);
   });
 
   destinationInput.addEventListener('input', (e) => {
+    state.routeEnd = null; // clear stored coords when user edits manually
     updateMapEnd(e.target.value);
     updateMapAlert(state.selectedMode, e.target.value);
   });
@@ -87,7 +90,7 @@ export const init = () => {
     });
   });
 
-  document.getElementById('route-form').addEventListener('submit', (e) => {
+  document.getElementById('route-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.currentTarget.querySelector('button[type=submit]');
     const orig = btn.innerHTML;
@@ -96,11 +99,9 @@ export const init = () => {
       ? '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> AI agent analysing profile &amp; live conditions…'
       : '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Calculating route…';
     routeState.textContent = 'Routing…';
-    setTimeout(() => {
-      buildRoute(destinationInput.value, state.selectedMode);
-      btn.disabled = false;
-      btn.innerHTML = orig;
-    }, 2000);
+    await buildRoute(destinationInput.value, state.selectedMode);
+    btn.disabled = false;
+    btn.innerHTML = orig;
   });
 
   document.getElementById('reroute-btn').addEventListener('click', () => {
@@ -137,6 +138,7 @@ export const init = () => {
   createAutocomplete(
     document.getElementById('current-location'),
     (label, lat, lng) => {
+      state.routeStart = [lat, lng];
       updateMapStart(label);
       setStartMarker([lat, lng], label);
       centreOn([lat, lng], 15);
@@ -146,6 +148,7 @@ export const init = () => {
   createAutocomplete(
     document.getElementById('destination'),
     (label, lat, lng) => {
+      state.routeEnd = [lat, lng];
       updateMapEnd(label);
       updateMapAlert(state.selectedMode, label);
       setEndMarker([lat, lng], label);
