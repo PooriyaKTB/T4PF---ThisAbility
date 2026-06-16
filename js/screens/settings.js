@@ -1,5 +1,5 @@
 import { userProfile, state, saveProfile, clearProfile } from '../state.js';
-import { showToast, setScreen, updateProfileUi, firstName } from '../ui.js';
+import { showToast, setScreen, updateProfileUi, syncModeButtons, firstName } from '../ui.js';
 
 export const init = () => {
   const profileCompleteness = document.getElementById('profile-completeness');
@@ -23,8 +23,11 @@ export const init = () => {
     if (allergyShareEl) userProfile.allergyShareVenue  = allergyShareEl.classList.contains('on');
 
     profileCompleteness.textContent = '100';
+    // Keep routing mode in sync with the saved mobility preference
+    state.selectedMode = userProfile.mobility;
     saveProfile();
     updateProfileUi();
+    syncModeButtons();
     showToast('Profile saved. The app now follows these preferences.');
   });
 

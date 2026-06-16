@@ -84,7 +84,6 @@ export const journeyTfL = async (start, end, appMode) => {
   const qs = p.toString().replace(/%2C/gi, ',');
   const url = `${BASE}/Journey/JourneyResults/${start[0]},${start[1]}/to/${end[0]},${end[1]}?${qs}`;
 
-  console.log('[TfL Journey]', url);
   const res = await fetch(url, {
     headers: { Accept: 'application/json' },
     signal: AbortSignal.timeout(12000),
@@ -92,7 +91,6 @@ export const journeyTfL = async (start, end, appMode) => {
 
   if (!res.ok) throw new Error(`TfL HTTP ${res.status}`);
   const data = await res.json();
-  console.log('[TfL Journey] response:', data);
   if (!data.journeys?.length) throw new Error('No journeys returned');
 
   const journey = data.journeys[0];

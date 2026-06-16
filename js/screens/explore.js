@@ -29,6 +29,8 @@ export const init = () => {
     gpsBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>';
     gpsBtn.disabled  = true;
 
+    const _resetBtn = () => { gpsBtn.innerHTML = orig; gpsBtn.disabled = false; };
+
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude: lat, longitude: lng } }) => {
         state.routeStart = [lat, lng];
@@ -53,8 +55,7 @@ export const init = () => {
         }
 
         showToast('Current location set.');
-        gpsBtn.innerHTML = orig;
-        gpsBtn.disabled  = false;
+        _resetBtn();
       },
       (err) => {
         const msgs = {
@@ -63,8 +64,7 @@ export const init = () => {
           3: 'Location request timed out. Try again.',
         };
         showToast(msgs[err.code] || 'Could not get your location.');
-        gpsBtn.innerHTML = orig;
-        gpsBtn.disabled  = false;
+        _resetBtn();
       },
       { timeout: 10000, enableHighAccuracy: true }
     );
