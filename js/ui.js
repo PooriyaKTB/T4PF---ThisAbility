@@ -102,3 +102,9 @@ export const unlockDemo = (message) => {
   updateProfileUi();
   showToast(message);
 };
+
+export const silentUnlock = () => {
+  phoneFrame.classList.remove('demo-locked');
+  setScreen('explore');
+  updateProfileUi();
+};

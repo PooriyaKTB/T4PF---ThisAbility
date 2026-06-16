@@ -5,6 +5,7 @@
   justify-content: flex-start;
   gap: 24px;
   padding: 52px 22px 32px;
+  overflow-y: auto;
   background:
     linear-gradient(180deg, rgba(37, 99, 235, 0.1), transparent 42%),
     var(--bg-color);

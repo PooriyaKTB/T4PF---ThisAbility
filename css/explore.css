@@ -52,7 +52,7 @@
   position: absolute;
   left: 34px;
   top: 114px;
-  width: 274px;
+  width: calc(100% - 68px);
   height: 4px;
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   border-radius: 999px;
@@ -108,6 +108,7 @@
   top: 10px;
   transform: translateX(-50%);
   white-space: nowrap;
+  max-width: calc(100% - 16px);
 }
 
 .route-result {

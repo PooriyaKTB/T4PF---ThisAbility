@@ -1,4 +1,4 @@
-import { userProfile, state } from '../state.js';
+import { userProfile, state, saveProfile, clearProfile } from '../state.js';
 import { showToast, setScreen, updateProfileUi, firstName } from '../ui.js';
 
 export const init = () => {
@@ -23,6 +23,7 @@ export const init = () => {
     if (allergyShareEl) userProfile.allergyShareVenue  = allergyShareEl.classList.contains('on');
 
     profileCompleteness.textContent = '100';
+    saveProfile();
     updateProfileUi();
     showToast('Profile saved. The app now follows these preferences.');
   });
@@ -38,7 +39,14 @@ export const init = () => {
   });
 
   document.getElementById('profile-demo-reset').addEventListener('click', () => {
-    if (state.initialProfile) Object.assign(userProfile, { ...state.initialProfile });
+    if (state.initialProfile) {
+      Object.assign(userProfile, { ...state.initialProfile });
+      saveProfile();
+    } else {
+      clearProfile();
+      location.reload();
+      return;
+    }
     profileCompleteness.textContent = '86';
     updateProfileUi();
     showToast(`Profile reset to your original settings, ${firstName()}.`);

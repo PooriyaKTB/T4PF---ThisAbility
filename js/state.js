@@ -1,3 +1,22 @@
+const PROFILE_KEY = 'ta_profile_v1';
+
+export const saveProfile = () => {
+  try { localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile)); } catch (_) {}
+};
+
+export const loadProfile = () => {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return false;
+    Object.assign(userProfile, JSON.parse(raw));
+    return true;
+  } catch (_) { return false; }
+};
+
+export const clearProfile = () => {
+  try { localStorage.removeItem(PROFILE_KEY); } catch (_) {}
+};
+
 export const userProfile = {
   name: '',
   email: '',

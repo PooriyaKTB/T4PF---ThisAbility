@@ -1,4 +1,4 @@
-import { userProfile, state } from '../state.js';
+import { userProfile, state, saveProfile } from '../state.js';
 import { unlockDemo, firstName } from '../ui.js';
 
 export const init = () => {
@@ -13,6 +13,7 @@ export const init = () => {
     const disabilityEl   = document.getElementById('auth-disability');
     if (disabilityEl?.value) userProfile.disability = disabilityEl.value;
     state.initialProfile = { ...userProfile };
+    saveProfile();
     unlockDemo(`Welcome, ${firstName()}!`);
   });
 };
