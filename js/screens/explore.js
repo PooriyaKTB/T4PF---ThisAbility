@@ -70,6 +70,19 @@ export const init = () => {
     );
   });
 
+  document.getElementById('swap-btn').addEventListener('click', () => {
+    const fromEl = document.getElementById('current-location');
+    const toEl   = document.getElementById('destination');
+    const tmpVal = fromEl.value;
+    fromEl.value = toEl.value;
+    toEl.value   = tmpVal;
+    const tmpCoords  = state.routeStart;
+    state.routeStart = state.routeEnd;
+    state.routeEnd   = tmpCoords;
+    updateMapStart(fromEl.value);
+    updateMapEnd(toEl.value);
+  });
+
   document.getElementById('current-location').addEventListener('input', (e) => {
     state.routeStart = null; // clear stored coords when user edits manually
     updateMapStart(e.target.value);

@@ -115,41 +115,42 @@
       <div class="content" id="content">
         <section class="screen active" data-screen="explore">
           <form class="card" id="route-form">
-            <div class="section-title">Accessible Routing</div>
-            <div class="routing-input" style="position:relative;">
-              <i class="fas fa-map-marker-alt" aria-hidden="true" style="color:var(--danger);"></i>
-              <input id="current-location" type="text" placeholder="From — your start location" style="flex:1;" />
-              <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
-                <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+            <div class="routing-inputs-stack">
+              <div class="routing-input" style="position:relative;">
+                <i class="fas fa-circle-dot" aria-hidden="true" style="color:var(--primary);"></i>
+                <input id="current-location" type="text" placeholder="From — your start location" style="flex:1;" />
+                <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
+                  <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+                </button>
+              </div>
+              <button type="button" id="swap-btn" class="swap-btn" aria-label="Swap start and destination">
+                <i class="fas fa-arrow-up-arrow-down" aria-hidden="true"></i>
               </button>
+              <div class="routing-input">
+                <i class="fas fa-location-dot" aria-hidden="true" style="color:var(--danger);"></i>
+                <input
+                  id="destination"
+                  type="text"
+                  placeholder="Where to? (e.g. Waterloo Station)"
+                  autocomplete="off"
+                />
+              </div>
             </div>
-            <div class="routing-input">
-              <i class="fas fa-search" aria-hidden="true"></i>
-              <input
-                id="destination"
-                type="text"
-                placeholder="Where to? (e.g. Waterloo Station)"
-                autocomplete="off"
-              />
-            </div>
-            <div class="mode-grid" aria-label="Route needs">
+            <div class="mode-pills" role="group" aria-label="Route preference">
               <button class="mode-chip active" type="button" data-mode="Step-free">
-                Step-free
+                <i class="fas fa-wheelchair" aria-hidden="true"></i> Step-free
               </button>
               <button class="mode-chip" type="button" data-mode="Low crowd">
-                Low crowd
+                <i class="fas fa-users-slash" aria-hidden="true"></i> Low crowd
               </button>
               <button class="mode-chip" type="button" data-mode="Quiet">
-                Quiet
+                <i class="fas fa-volume-xmark" aria-hidden="true"></i> Quiet
               </button>
               <button class="mode-chip" type="button" data-mode="Fastest">
-                Fastest
+                <i class="fas fa-bolt" aria-hidden="true"></i> Fastest
               </button>
-            </div>
-            <div style="margin-top:8px;">
-              <button class="mode-chip" type="button" data-mode="AI Agent" id="ai-route-chip" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--secondary);color:var(--secondary);">
-                <i class="fas fa-robot" aria-hidden="true"></i>
-                AI Agent — adapts to your profile &amp; live conditions
+              <button class="mode-chip mode-chip--ai" type="button" data-mode="AI Agent" id="ai-route-chip">
+                <i class="fas fa-robot" aria-hidden="true"></i> AI Agent
               </button>
             </div>
             <button class="primary-btn" type="submit" style="margin-top: 12px">

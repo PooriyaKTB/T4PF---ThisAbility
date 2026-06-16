@@ -52,7 +52,6 @@
   color: var(--danger);
 }
 
-.mode-grid,
 .modules-grid,
 .metrics-grid {
   display: grid;
@@ -60,21 +59,50 @@
   gap: 10px;
 }
 
+/* ── Mode pills — horizontal scroll row of compact chips ── */
+.mode-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 4px;
+}
+.mode-pills::-webkit-scrollbar { display: none; }
+
 .mode-chip {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
   background: white;
   color: var(--text-main);
-  font-size: 0.75rem;
-  font-weight: 800;
-  min-height: 40px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
+
+.mode-chip i { font-size: 0.68rem; }
 
 .mode-chip.active {
   border-color: var(--primary);
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+.mode-chip--ai {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+.mode-chip--ai.active {
+  background: #ccfbf1;
+  border-color: var(--secondary);
+  color: var(--secondary);
 }
 
 .alert-box {
