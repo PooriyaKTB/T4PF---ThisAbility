@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, setEndMarker, centreOn } from '../map.js';
+import { setStartMarker, setEndMarker, centreOn, markAllAvoided, markAllVerified } from '../map.js';
 import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
@@ -104,7 +104,8 @@ export const init = () => {
     btn.innerHTML = orig;
   });
 
-  document.getElementById('reroute-btn').addEventListener('click', () => {
+  document.getElementById('avoid-all-btn').addEventListener('click', () => {
+    markAllAvoided();
     state.selectedMode = userProfile.mobility;
     syncModeButtons();
     buildRoute(destinationInput.value || 'Waterloo', state.selectedMode);
@@ -112,7 +113,8 @@ export const init = () => {
     alertStatus.classList.replace('warning', 'info');
   });
 
-  document.getElementById('verify-btn').addEventListener('click', () => {
+  document.getElementById('verify-all-btn').addEventListener('click', () => {
+    markAllVerified();
     state.verifiedReports += 1;
     crowdCount.textContent = state.verifiedReports;
     alertStatus.textContent = 'Verified';

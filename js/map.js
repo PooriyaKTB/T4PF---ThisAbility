@@ -69,6 +69,22 @@ const _loadFaults = () => {
     .catch(() => {});
 };
 
+/* Module-level mark helpers — exported so explore.js can call markAll* from bulk buttons */
+export const markVerifiedBtn = (btn) => {
+  btn.textContent = 'Verified ✓';
+  btn.classList.add('verified');
+  btn.disabled = true;
+};
+export const markAvoidedBtn = (btn) => {
+  btn.textContent = 'Avoided ✓';
+  btn.classList.add('avoided');
+  btn.disabled = true;
+};
+export const markAllVerified = () =>
+  document.querySelectorAll('#alert-body .disruption-verify-btn:not(:disabled)').forEach(markVerifiedBtn);
+export const markAllAvoided = () =>
+  document.querySelectorAll('#alert-body .disruption-avoid-btn:not(:disabled)').forEach(markAvoidedBtn);
+
 /* Updates the Live Obstacle Alert card with one verify-able row per disrupted line.
    `lines`   — array of disrupted line names (e.g. ['Jubilee', 'Piccadilly'])
    `onRoute` — true when disruptions come from the user's selected route legs */
@@ -83,6 +99,7 @@ export const updateAlertCard = (lines, onRoute = false) => {
     return;
   }
 
+  // innerHTML replacement destroys old nodes + listeners — fresh buttons each call
   body.innerHTML = lines.map((name) => `
     <div class="disruption-row" data-line="${name}">
       <span class="disruption-info">
@@ -95,31 +112,8 @@ export const updateAlertCard = (lines, onRoute = false) => {
       </span>
     </div>`).join('');
 
-  const _markVerified = (btn) => {
-    btn.textContent = 'Verified ✓';
-    btn.classList.add('verified');
-    btn.disabled = true;
-  };
-  const _markAvoided = (btn) => {
-    btn.textContent = 'Avoided ✓';
-    btn.classList.add('avoided');
-    btn.disabled = true;
-  };
-
-  body.querySelectorAll('.disruption-verify-btn').forEach((btn) => btn.addEventListener('click', () => _markVerified(btn)));
-  body.querySelectorAll('.disruption-avoid-btn').forEach((btn)  => btn.addEventListener('click', () => _markAvoided(btn)));
-
-  // Bulk buttons
-  const avoidAllBtn  = document.getElementById('avoid-all-btn');
-  const verifyAllBtn = document.getElementById('verify-all-btn');
-  if (avoidAllBtn) {
-    avoidAllBtn.onclick = () =>
-      body.querySelectorAll('.disruption-avoid-btn:not(:disabled)').forEach(_markAvoided);
-  }
-  if (verifyAllBtn) {
-    verifyAllBtn.onclick = () =>
-      body.querySelectorAll('.disruption-verify-btn:not(:disabled)').forEach(_markVerified);
-  }
+  body.querySelectorAll('.disruption-verify-btn').forEach((btn) => btn.addEventListener('click', () => markVerifiedBtn(btn)));
+  body.querySelectorAll('.disruption-avoid-btn').forEach((btn)  => btn.addEventListener('click', () => markAvoidedBtn(btn)));
 
   if (statusChip) {
     statusChip.textContent = `${lines.length} disruption${lines.length === 1 ? '' : 's'}`;
