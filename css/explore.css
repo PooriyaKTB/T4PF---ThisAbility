@@ -262,6 +262,40 @@
   display: block;
 }
 
+/* ── Modules collapsible section ─── */
+.modules-disclosure {
+  margin-top: 12px;
+}
+
+.modules-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 4px;
+  user-select: none;
+}
+.modules-summary::-webkit-details-marker { display: none; }
+.modules-summary i:first-child { color: var(--primary); font-size: 0.75rem; }
+
+.modules-chevron {
+  margin-left: auto;
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+}
+
+.modules-disclosure[open] .modules-chevron {
+  transform: rotate(180deg);
+}
+
+.modules-disclosure .modules-grid {
+  margin-top: 8px;
+}
+
 /* ── Live Obstacle Alert — per-disruption rows ─── */
 .disruption-row {
   display: flex;

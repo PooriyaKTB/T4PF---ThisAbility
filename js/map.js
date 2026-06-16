@@ -89,15 +89,17 @@ export const markAllAvoided = () =>
    `lines`   — array of disrupted line names (e.g. ['Jubilee', 'Piccadilly'])
    `onRoute` — true when disruptions come from the user's selected route legs */
 export const updateAlertCard = (lines, onRoute = false) => {
+  const card       = document.getElementById('alert-card');
   const body       = document.getElementById('alert-body');
   const statusChip = document.getElementById('alert-status');
   if (!body) return;
 
   if (!lines.length) {
-    body.innerHTML = '<p class="muted" style="margin:0">No service disruptions on monitored lines right now.</p>';
-    if (statusChip) { statusChip.textContent = 'All clear'; statusChip.className = 'chip info'; }
+    if (card) card.hidden = true;
     return;
   }
+
+  if (card) card.hidden = false;
 
   // innerHTML replacement destroys old nodes + listeners — fresh buttons each call
   body.innerHTML = lines.map((name) => `

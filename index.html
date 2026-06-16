@@ -176,17 +176,15 @@
           <span id="map-alert-tag" class="sr-only"></span>
           <span id="map-destination" class="sr-only">Waterloo</span>
 
-          <div class="card alert-box" id="alert-card">
+          <div class="card alert-box" id="alert-card" hidden>
             <div class="alert-header">
               <span>
                 <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
                 Live Obstacle Alert
               </span>
-              <span class="chip warning" id="alert-status">Unresolved</span>
+              <span class="chip warning" id="alert-status">Disruptions</span>
             </div>
-            <p class="muted" id="alert-body" aria-live="polite">
-              <strong>TfL data:</strong> Loading live network status…
-            </p>
+            <div id="alert-body" aria-live="polite"></div>
             <div class="alert-actions">
               <button class="secondary-btn" type="button" id="avoid-all-btn">
                 <i class="fas fa-ban" aria-hidden="true"></i>
@@ -199,35 +197,42 @@
             </div>
           </div>
 
-          <div class="modules-grid">
-            <button class="module-btn active" type="button" data-module="map">
-              <i class="fas fa-map-location-dot" aria-hidden="true"></i>
-              <h4>Dynamic Map</h4>
-              <p>Predicts barriers with live city and crowd data.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="alerts">
-              <i class="fas fa-bell" aria-hidden="true"></i>
-              <h4>Surround Alerts</h4>
-              <p>Micro-obstacle and sensory warning layer.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="passport">
-              <i class="fas fa-id-card" aria-hidden="true"></i>
-              <h4>CapAble ID</h4>
-              <p>Optional BLE access profile for venues.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="guardian">
-              <i class="fas fa-heart-pulse" aria-hidden="true"></i>
-              <h4>Guardian</h4>
-              <p>Fall detection connected to routing context.</p>
-            </button>
-          </div>
-          <div class="card module-detail visible" id="module-detail" aria-live="polite" aria-atomic="true">
-            <strong id="module-title">Dynamic Map</strong>
-            <p class="muted" id="module-copy">
-              Routes combine public transport status, static accessibility data,
-              and community-verified obstacles before suggesting a journey.
-            </p>
-          </div>
+          <details class="modules-disclosure" id="modules-disclosure">
+            <summary class="modules-summary">
+              <i class="fas fa-grid-2" aria-hidden="true"></i>
+              Features
+              <i class="fas fa-chevron-down modules-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="modules-grid">
+              <button class="module-btn active" type="button" data-module="map">
+                <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+                <h4>Dynamic Map</h4>
+                <p>Predicts barriers with live city and crowd data.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="alerts">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                <h4>Surround Alerts</h4>
+                <p>Micro-obstacle and sensory warning layer.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="passport">
+                <i class="fas fa-id-card" aria-hidden="true"></i>
+                <h4>CapAble ID</h4>
+                <p>Optional BLE access profile for venues.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="guardian">
+                <i class="fas fa-heart-pulse" aria-hidden="true"></i>
+                <h4>Guardian</h4>
+                <p>Fall detection connected to routing context.</p>
+              </button>
+            </div>
+            <div class="card module-detail visible" id="module-detail" aria-live="polite" aria-atomic="true">
+              <strong id="module-title">Dynamic Map</strong>
+              <p class="muted" id="module-copy">
+                Routes combine public transport status, static accessibility data,
+                and community-verified obstacles before suggesting a journey.
+              </p>
+            </div>
+          </details>
 
           <div class="card" id="surround-scan-card" style="display:none;">
             <div class="section-title">Surround Scan — Live</div>
