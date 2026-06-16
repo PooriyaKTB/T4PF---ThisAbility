@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { initMap } from '../map.js';
+import { setStartMarker, centreOn } from '../map.js';
 
 const surroundAlertsData = [
   { icon: 'fa-arrow-down', color: 'var(--warning)', label: 'Kerb drop',      text: 'Steep kerb drop in 14m — haptic alert queued for your profile.' },
@@ -10,18 +10,62 @@ const surroundAlertsData = [
 ];
 
 export const init = () => {
-  initMap();
-
   const destinationInput = document.getElementById('destination');
   const routeState       = document.getElementById('route-state');
   const alertStatus      = document.getElementById('alert-status');
   const crowdCount       = document.getElementById('crowd-count');
 
   document.getElementById('gps-btn').addEventListener('click', () => {
-    const loc = 'London, Pancras Square';
-    document.getElementById('current-location').value = loc;
-    updateMapStart(loc);
-    showToast('Location set to London, Pancras Square.');
+    if (!navigator.geolocation) {
+      showToast('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    const gpsBtn       = document.getElementById('gps-btn');
+    const locationInput = document.getElementById('current-location');
+    const orig         = gpsBtn.innerHTML;
+
+    gpsBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>';
+    gpsBtn.disabled  = true;
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude: lat, longitude: lng } }) => {
+        centreOn([lat, lng], 16);
+        setStartMarker([lat, lng], 'Your location');
+
+        // Reverse-geocode via Nominatim (free, no key required)
+        try {
+          const res  = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+            { headers: { 'Accept-Language': 'en-GB' } }
+          );
+          const data = await res.json();
+          const a    = data.address || {};
+          const label = [a.road, a.suburb || a.neighbourhood || a.city_district]
+            .filter(Boolean).join(', ') || data.display_name.split(',')[0];
+          locationInput.value = label;
+          updateMapStart(label);
+        } catch (_) {
+          locationInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          updateMapStart(locationInput.value);
+        }
+
+        showToast('Current location set.');
+        gpsBtn.innerHTML = orig;
+        gpsBtn.disabled  = false;
+      },
+      (err) => {
+        const msgs = {
+          1: 'Location access denied — enable it in your browser settings.',
+          2: 'Location unavailable. Check your connection and try again.',
+          3: 'Location request timed out. Try again.',
+        };
+        showToast(msgs[err.code] || 'Could not get your location.');
+        gpsBtn.innerHTML = orig;
+        gpsBtn.disabled  = false;
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   });
 
   document.getElementById('current-location').addEventListener('input', (e) => {

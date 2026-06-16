@@ -1,5 +1,5 @@
 import { userProfile, state, screenCopy } from './state.js';
-import { refreshMap } from './map.js';
+import { initMap } from './map.js';
 
 const phoneFrame = document.getElementById('phone-frame');
 const toast      = document.getElementById('toast');
@@ -95,20 +95,20 @@ export const setScreen = (screenName) => {
         : screenCopy[screenName].heading;
   document.getElementById('screen-subtitle').textContent = screenCopy[screenName].subtitle;
   content.scrollTop = 0;
-  if (screenName === 'explore') refreshMap();
+  if (screenName === 'explore') {
+    initMap(); // double-rAF: first frame commits layout, second frame has stable dimensions
+  }
 };
 
 export const unlockDemo = (message) => {
   phoneFrame.classList.remove('demo-locked');
-  setScreen('explore');
+  setScreen('explore'); // setScreen calls initMap() with double-rAF
   updateProfileUi();
   showToast(message);
-  refreshMap();
 };
 
 export const silentUnlock = () => {
   phoneFrame.classList.remove('demo-locked');
   setScreen('explore');
   updateProfileUi();
-  refreshMap();
 };
