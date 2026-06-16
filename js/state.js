@@ -1,4 +1,19 @@
 const PROFILE_KEY = 'ta_profile_v1';
+const STATE_KEY   = 'ta_state_v1';
+
+export const saveState = () => {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify({ verifiedReports: state.verifiedReports, barriersLogged: state.barriersLogged })); } catch (_) {}
+};
+
+export const loadState = () => {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.verifiedReports != null) state.verifiedReports = saved.verifiedReports;
+    if (saved.barriersLogged  != null) state.barriersLogged  = saved.barriersLogged;
+  } catch (_) {}
+};
 
 export const saveProfile = () => {
   try { localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile)); } catch (_) {}

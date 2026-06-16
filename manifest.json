@@ -2,7 +2,8 @@
   "name": "EquiVerse — ThisAbility",
   "short_name": "EquiVerse",
   "description": "Accessible route planning, safety monitoring, and emergency guardian alerts.",
-  "start_url": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
@@ -11,13 +12,7 @@
   "icons": [
     {
       "src": "assets/logo-icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "assets/logo-icon.png",
-      "sizes": "512x512",
+      "sizes": "472x472",
       "type": "image/png",
       "purpose": "any maskable"
     }

@@ -1,4 +1,4 @@
-import { userProfile, state, saveProfile, clearProfile } from '../state.js';
+import { userProfile, state, saveProfile, saveState, clearProfile } from '../state.js';
 import { showToast, setScreen, updateProfileUi, syncModeButtons, firstName } from '../ui.js';
 
 export const init = () => {
@@ -61,6 +61,7 @@ export const init = () => {
         const isNowOn = btn.classList.contains('on');
         state.barriersLogged = Math.max(0, state.barriersLogged + (isNowOn ? 1 : -1));
         barrierCount.textContent = state.barriersLogged;
+        saveState();
       }
     });
   });

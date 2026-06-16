@@ -1,4 +1,4 @@
-import { userProfile, state, moduleContent } from '../state.js';
+import { userProfile, state, moduleContent, saveState } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
 import { setStartMarker, setEndMarker, centreOn, markAllAvoided, markAllVerified } from '../map.js';
@@ -117,6 +117,7 @@ export const init = () => {
     markAllVerified();
     state.verifiedReports += 1;
     crowdCount.textContent = state.verifiedReports;
+    saveState();
     alertStatus.textContent = 'Verified';
     alertStatus.classList.replace('warning', 'info');
     showToast('Thanks. Your anonymous verification improved route confidence.');
@@ -128,9 +129,11 @@ export const init = () => {
       document.querySelectorAll('.module-btn').forEach((b) => b.classList.toggle('active', b === btn));
       document.getElementById('module-title').textContent = module.title;
       document.getElementById('module-copy').textContent  = module.copy;
-      const surroundCard = document.getElementById('surround-scan-card');
+      const surroundCard  = document.getElementById('surround-scan-card');
+      const moduleDetail  = document.getElementById('module-detail');
       const isAlerts = btn.dataset.module === 'alerts';
-      surroundCard.style.display = isAlerts ? 'block' : 'none';
+      surroundCard.style.display  = isAlerts ? 'block' : 'none';
+      if (moduleDetail) moduleDetail.style.display = isAlerts ? 'none' : 'block';
       if (!isAlerts) document.getElementById('surround-alerts-list').innerHTML = '';
       showToast(`${module.title} selected.`);
     });
