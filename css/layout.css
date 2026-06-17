@@ -63,17 +63,16 @@ header {
 /* Collapsed state — logo + user chip stay, hero text slides away */
 header.collapsed {
   padding-top: 14px;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
 }
 
 header.collapsed .header-top {
-  margin-bottom: 0; /* remove gap when content below is hidden */
+  margin-bottom: 0;
 }
 
 header.collapsed #screen-heading,
 header.collapsed #screen-subtitle,
-header.collapsed .status-row,
-header.collapsed .logo-text {
+header.collapsed .status-row {
   display: none;
 }
 

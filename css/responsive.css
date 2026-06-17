@@ -48,8 +48,8 @@
   }
 
   header.collapsed {
-    padding-top: calc(env(safe-area-inset-top, 44px) + 6px);
-    padding-bottom: 12px;
+    padding-top: calc(env(safe-area-inset-top, 44px) + 8px);
+    padding-bottom: 14px;
   }
 
   .content {
