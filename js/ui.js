@@ -7,31 +7,46 @@ const toastMsg   = document.getElementById('toast-message');
 const content    = document.getElementById('content');
 const header     = document.querySelector('header');
 
-// Collapse when scrolling down past threshold.
-// Only expand when user force-pulls past the top (overscroll gesture) — not on a normal scroll-to-top.
-let _headerCollapsed = false;
-let _touchStartY = 0;
+// Collapse on scroll-down past threshold.
+// Expand only when user intentionally forces past the top:
+//   desktop → wheel up while already at scrollTop 0
+//   mobile  → touch-drag down ≥36px while already at scrollTop 0
+let _collapsed = false;
+let _touchY0 = null;
 
 content.addEventListener('scroll', () => {
-  if (content.scrollTop > 40 && !_headerCollapsed) {
+  if (!_collapsed && content.scrollTop > 40) {
     header.classList.add('collapsed');
-    _headerCollapsed = true;
+    _collapsed = true;
+  }
+  // Reset touch anchor each time we land at the top
+  if (content.scrollTop === 0) _touchY0 = null;
+}, { passive: true });
+
+// Desktop: wheel-up past top
+content.addEventListener('wheel', (e) => {
+  if (_collapsed && content.scrollTop === 0 && e.deltaY < 0) {
+    header.classList.remove('collapsed');
+    _collapsed = false;
   }
 }, { passive: true });
 
+// Mobile: pull-down past top
 content.addEventListener('touchstart', (e) => {
-  _touchStartY = e.touches[0].clientY;
+  if (_collapsed && content.scrollTop === 0) _touchY0 = e.touches[0].clientY;
 }, { passive: true });
 
 content.addEventListener('touchmove', (e) => {
-  if (content.scrollTop === 0 && _headerCollapsed) {
-    const pullDistance = e.touches[0].clientY - _touchStartY;
-    if (pullDistance > 32) {
+  if (_collapsed && content.scrollTop === 0 && _touchY0 !== null) {
+    if (e.touches[0].clientY - _touchY0 > 36) {
       header.classList.remove('collapsed');
-      _headerCollapsed = false;
+      _collapsed = false;
+      _touchY0 = null;
     }
   }
 }, { passive: true });
+
+content.addEventListener('touchend', () => { _touchY0 = null; }, { passive: true });
 
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
 export const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || 'Maya';
