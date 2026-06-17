@@ -48,6 +48,29 @@ content.addEventListener('touchmove', (e) => {
 
 content.addEventListener('touchend', () => { _touchY0 = null; }, { passive: true });
 
+/* ── Swipe left/right to change screens ── */
+const SCREENS = ['explore', 'passport', 'guardian', 'settings'];
+let _swipeX0 = null;
+let _swipeY0 = null;
+
+content.addEventListener('touchstart', (e) => {
+  _swipeX0 = e.touches[0].clientX;
+  _swipeY0 = e.touches[0].clientY;
+}, { passive: true });
+
+content.addEventListener('touchend', (e) => {
+  if (_swipeX0 === null) return;
+  const dx = e.changedTouches[0].clientX - _swipeX0;
+  const dy = e.changedTouches[0].clientY - _swipeY0;
+  _swipeX0 = null;
+  _swipeY0 = null;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+  const idx = SCREENS.indexOf(state.currentScreen);
+  if (idx === -1) return;
+  const next = dx < 0 ? SCREENS[idx + 1] : SCREENS[idx - 1];
+  if (next) setScreen(next);
+}, { passive: true });
+
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
 export const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || 'Maya';
 export const getGreeting      = () => {
