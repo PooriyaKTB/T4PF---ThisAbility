@@ -383,6 +383,10 @@
   margin-top: 12px;
 }
 
+#surround-scan-card {
+  margin-top: 12px;
+}
+
 .modules-summary {
   display: flex;
   align-items: center;
