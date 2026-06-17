@@ -18,6 +18,67 @@ let _liveMarker  = null;
 let _routeLine   = null;
 let _legLines    = [];
 let _faultLayer  = null;
+let _flowMarker  = null;
+let _flowRaf     = null;
+
+/* ── Flow animation helpers ── */
+const _dist = (a, b) => {
+  const dx = a[0] - b[0], dy = a[1] - b[1];
+  return Math.sqrt(dx * dx + dy * dy);
+};
+const _lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+
+const startFlowAnimation = (coords) => {
+  stopFlowAnimation();
+  if (!_map || coords.length < 2) return;
+
+  const dists = [0];
+  for (let i = 1; i < coords.length; i++) dists.push(dists[i - 1] + _dist(coords[i - 1], coords[i]));
+  const total = dists[dists.length - 1];
+  if (total === 0) return;
+
+  const icon = L.divIcon({ className: '', iconSize: [22, 22], iconAnchor: [11, 11], html: '<div class="flow-orb"></div>' });
+  _flowMarker = L.marker(coords[0], { icon, zIndexOffset: 850, keyboard: false, interactive: false }).addTo(_map);
+
+  const DURATION = 2600;
+  const PAUSE    = 600;
+  let   t0       = null;
+
+  const tick = (ts) => {
+    if (!_flowMarker) return;
+    if (!t0) t0 = ts;
+    const elapsed = (ts - t0) % (DURATION + PAUSE);
+
+    const el = _flowMarker.getElement();
+    if (elapsed > DURATION) {
+      if (el) el.style.opacity = '0';
+      _flowRaf = requestAnimationFrame(tick);
+      return;
+    }
+
+    const progress = elapsed / DURATION;
+    const target   = progress * total;
+
+    let seg = 0;
+    for (let i = 1; i < dists.length; i++) { if (dists[i] >= target) { seg = i - 1; break; } seg = i - 1; }
+    seg = Math.min(seg, coords.length - 2);
+
+    const segLen = dists[seg + 1] - dists[seg];
+    const segT   = segLen > 0 ? (target - dists[seg]) / segLen : 0;
+    _flowMarker.setLatLng(_lerp(coords[seg], coords[seg + 1], segT));
+
+    const opacity = progress < 0.08 ? progress / 0.08 : progress > 0.88 ? (1 - progress) / 0.12 : 1;
+    if (el) el.style.opacity = String(Math.max(0, Math.min(1, opacity)));
+
+    _flowRaf = requestAnimationFrame(tick);
+  };
+  _flowRaf = requestAnimationFrame(tick);
+};
+
+const stopFlowAnimation = () => {
+  if (_flowRaf)    { cancelAnimationFrame(_flowRaf); _flowRaf = null; }
+  if (_flowMarker) { _flowMarker.remove(); _flowMarker = null; }
+};
 
 const _tileUrl = () => {
   const theme = userProfile.mapTheme ?? 'auto';
@@ -233,6 +294,7 @@ export const drawRoute = (latlngs, colour = '#2563eb') => {
     color: colour, weight: 5, opacity: 0.85, lineJoin: 'round',
   }).addTo(_map);
   _map.fitBounds(_routeLine.getBounds(), { padding: [24, 24] });
+  startFlowAnimation(latlngs);
 };
 
 /* Draw multiple coloured legs (TfL Journey Planner output).
@@ -259,9 +321,9 @@ export const drawLegs = (legs) => {
 
   if (all.length > 1) {
     _map.fitBounds(L.latLngBounds(all), { padding: [24, 24] });
-    // Re-invalidate after bounds change so tiles load at the new zoom level
     setTimeout(() => _map.invalidateSize({ animate: false }), 100);
   }
+  startFlowAnimation(all);
 };
 
 export const clearRoute = () => {
@@ -274,6 +336,7 @@ export const clearRoute = () => {
 
 /* Clears only the polyline(s), leaving markers in place */
 export const clearRouteLine = () => {
+  stopFlowAnimation();
   _legLines.forEach((l) => l.remove());
   _legLines = [];
   if (_routeLine) { _routeLine.remove(); _routeLine = null; }
