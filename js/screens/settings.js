@@ -1,9 +1,14 @@
 import { userProfile, state, saveProfile, saveState, clearProfile, clearAll } from '../state.js';
 import { showToast, setScreen, updateProfileUi, syncModeButtons, firstName } from '../ui.js';
+import { refreshTileTheme } from '../map.js';
 
 export const init = () => {
   const profileCompleteness = document.getElementById('profile-completeness');
   const barrierCount        = document.getElementById('barrier-count');
+  const mapThemeEl          = document.getElementById('map-theme-pref');
+
+  // Restore saved map theme into the select
+  if (userProfile.mapTheme) mapThemeEl.value = userProfile.mapTheme;
 
   document.getElementById('profile-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -13,7 +18,9 @@ export const init = () => {
     userProfile.sensory  = document.getElementById('sensory-pref').value;
     userProfile.alert    = document.getElementById('alert-pref').value;
     userProfile.text     = document.getElementById('text-pref').value;
-    userProfile.contrast = document.getElementById('contrast-pref').value;
+    userProfile.contrast  = document.getElementById('contrast-pref').value;
+    userProfile.mapTheme  = mapThemeEl.value;
+    refreshTileTheme();
 
     const allergyCatEl   = document.getElementById('allergy-category');
     const allergyDescEl  = document.getElementById('allergy-description');

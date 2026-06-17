@@ -54,6 +54,7 @@ export const userProfile = {
   text: 'standard',
   contrast: 'standard',
   darkMode: false,
+  mapTheme: 'auto',
 };
 
 export const state = {
