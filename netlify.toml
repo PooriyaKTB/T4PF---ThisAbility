@@ -1,0 +1,3 @@
+[build]
+  command = "echo \"export const GRAPHHOPPER_API_KEY = '$GRAPHHOPPER_API_KEY';\" > js/config.js"
+  publish = "."
