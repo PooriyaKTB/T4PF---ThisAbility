@@ -7,9 +7,30 @@ const toastMsg   = document.getElementById('toast-message');
 const content    = document.getElementById('content');
 const header     = document.querySelector('header');
 
-// Collapse header when user scrolls content down, restore on scroll-to-top
+// Collapse when scrolling down past threshold.
+// Only expand when user force-pulls past the top (overscroll gesture) — not on a normal scroll-to-top.
+let _headerCollapsed = false;
+let _touchStartY = 0;
+
 content.addEventListener('scroll', () => {
-  header.classList.toggle('collapsed', content.scrollTop > 40);
+  if (content.scrollTop > 40 && !_headerCollapsed) {
+    header.classList.add('collapsed');
+    _headerCollapsed = true;
+  }
+}, { passive: true });
+
+content.addEventListener('touchstart', (e) => {
+  _touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+content.addEventListener('touchmove', (e) => {
+  if (content.scrollTop === 0 && _headerCollapsed) {
+    const pullDistance = e.touches[0].clientY - _touchStartY;
+    if (pullDistance > 32) {
+      header.classList.remove('collapsed');
+      _headerCollapsed = false;
+    }
+  }
 }, { passive: true });
 
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
