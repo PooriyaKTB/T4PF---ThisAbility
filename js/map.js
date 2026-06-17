@@ -3,6 +3,13 @@ import { userProfile } from './state.js';
 
 const LONDON = [51.5074, -0.1278];
 
+const _loadLastPos = () => {
+  try { const p = JSON.parse(localStorage.getItem('ta_last_pos')); return Array.isArray(p) ? p : null; } catch (_) { return null; }
+};
+export const saveLastPos = (latlng) => {
+  try { localStorage.setItem('ta_last_pos', JSON.stringify(latlng)); } catch (_) {}
+};
+
 let _map         = null;
 let _tileLayer   = null;
 let _startMarker = null;
@@ -48,9 +55,13 @@ const _create = () => {
   const el = document.getElementById('leaflet-map');
   if (!el || el.offsetHeight === 0) return;
 
+  const cachedPos     = _loadLastPos();
+  const initialCenter = cachedPos ?? LONDON;
+  const initialZoom   = cachedPos ? 15 : 13;
+
   _map = L.map(el, {
-    center: LONDON,
-    zoom: 13,
+    center: initialCenter,
+    zoom: initialZoom,
     zoomControl: false,
     attributionControl: true,
   });
@@ -70,7 +81,10 @@ const _create = () => {
   // setView (not just invalidateSize) makes Leaflet recalculate tile coords from scratch.
   setTimeout(() => {
     _map.invalidateSize({ animate: false });
-    _map.setView(LONDON, 13, { animate: false });
+    _map.setView(initialCenter, initialZoom, { animate: false });
+    // Place live dot immediately from cache so it's visible even if GPS resolves
+    // before this map instance exists (race condition on fast/cached GPS fix).
+    if (cachedPos) setLiveMarker(cachedPos);
   }, 150);
 
   // Non-blocking: fetch live TfL disruptions and update alert card

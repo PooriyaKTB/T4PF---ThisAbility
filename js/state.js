@@ -64,8 +64,9 @@ export const state = {
   toastTimer: null,
   currentScreen: 'explore',
   initialProfile: null,
-  routeStart: null,  // [lat, lng] — set by GPS button or autocomplete selection
-  routeEnd:   null,  // [lat, lng] — set by autocomplete selection
+  routeStart: null,     // [lat, lng] — set by GPS button or autocomplete selection
+  routeEnd:   null,     // [lat, lng] — set by autocomplete selection
+  fromIsLive: false,    // true when From = user's GPS location (live dot covers it — no start marker)
 };
 
 export const screenCopy = {

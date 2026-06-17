@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent, saveState } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, clearStartMarker, setEndMarker, clearEndMarker, centreOn, setLiveMarker, clearRouteLine, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
+import { setStartMarker, clearStartMarker, setEndMarker, clearEndMarker, centreOn, setLiveMarker, clearRouteLine, enablePickMode, disablePickMode, markAllAvoided, markAllVerified, saveLastPos } from '../map.js';
 import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
@@ -51,15 +51,18 @@ export const init = () => {
 
     navigator.geolocation.getCurrentPosition(
       async ({ coords: { latitude: lat, longitude: lng } }) => {
-        // Always show live position dot and centre map
+        // Always show live position dot, centre map, and cache position for next load
         setLiveMarker([lat, lng]);
         centreOn([lat, lng], 16);
+        saveLastPos([lat, lng]);
 
-        // Update From field only when forced (GPS button) or field is empty
-        const shouldFill = force || !locationInput.value.trim();
+        // Fill From only if: field is empty, or it was already showing live GPS location.
+        // Never overwrite a manually typed address (even when GPS button is tapped).
+        const shouldFill = state.fromIsLive || !locationInput.value.trim();
         if (shouldFill) {
           state.routeStart = [lat, lng];
-          setStartMarker([lat, lng], 'Your location');
+          state.fromIsLive = true;
+          clearStartMarker();
 
           try {
             const res  = await fetch(
@@ -104,6 +107,7 @@ export const init = () => {
   clearFromBtn.addEventListener('click', () => {
     locationInput.value = '';
     state.routeStart = null;
+    state.fromIsLive = false;
     updateMapStart('');
     clearStartMarker();
     _clearRouteResult();
@@ -124,6 +128,47 @@ export const init = () => {
 
   /* GPS button: force=true so it always jumps + fills From, even if field has a value */
   document.getElementById('gps-btn').addEventListener('click', () => _autoLocate(false, true));
+
+  /* Swap From ↔ To */
+  document.getElementById('swap-btn').addEventListener('click', async () => {
+    const fromVal = locationInput.value;
+    const toVal   = destinationInput.value;
+    if (!fromVal && !toVal) return;
+
+    // Swap field text
+    locationInput.value    = toVal;
+    destinationInput.value = fromVal;
+
+    // Swap coordinates
+    const prevStart = state.routeStart;
+    const prevEnd   = state.routeEnd;
+    state.routeStart = prevEnd;
+    state.routeEnd   = prevStart;
+
+    // If old From was live GPS it's now the destination — reset flag, clear stale start marker
+    if (state.fromIsLive) {
+      state.fromIsLive = false;
+      clearStartMarker();
+    }
+
+    // Markers are placed only by routing.js when a route is drawn — clear them here
+    clearStartMarker();
+    clearEndMarker();
+
+    updateMapStart(toVal);
+    updateMapEnd(fromVal);
+    updateMapAlert(state.selectedMode, fromVal);
+    _syncClearFrom();
+    _syncClearTo();
+
+    // Recalculate route if one was already shown
+    if (document.getElementById('route-result').classList.contains('visible') && state.routeStart && state.routeEnd) {
+      _clearRouteResult();
+      await buildRoute(fromVal, state.selectedMode);
+      disablePickMode();
+      pickBar.hidden = true;
+    }
+  });
 
   locationInput.addEventListener('input', (e) => {
     state.routeStart = null;
@@ -157,6 +202,8 @@ export const init = () => {
       : '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Calculating route…';
     routeState.textContent = 'Routing…';
     await buildRoute(destinationInput.value, state.selectedMode);
+    disablePickMode();
+    pickBar.hidden = true;
     btn.disabled = false;
     btn.innerHTML = orig;
   });
@@ -165,7 +212,7 @@ export const init = () => {
     markAllAvoided();
     state.selectedMode = userProfile.mobility;
     syncModeButtons();
-    buildRoute(destinationInput.value || 'Waterloo', state.selectedMode);
+    buildRoute(destinationInput.value, state.selectedMode);
     alertStatus.textContent = 'Rerouted';
     alertStatus.classList.replace('warning', 'info');
   });
@@ -209,6 +256,7 @@ export const init = () => {
     locationInput,
     (label, lat, lng) => {
       state.routeStart = [lat, lng];
+      state.fromIsLive = false;
       updateMapStart(label);
       setStartMarker([lat, lng], label);
       centreOn([lat, lng], 15);
@@ -223,51 +271,43 @@ export const init = () => {
       updateMapEnd(label);
       updateMapAlert(state.selectedMode, label);
       setEndMarker([lat, lng], label);
+      centreOn([lat, lng], 15);
       _syncClearTo();
     }
   );
 
-  /* ── Tap-on-map pick mode ── */
+  /* ── Tap-on-map pick mode (destination only — From is always typed or GPS) ── */
   const pickBar      = document.getElementById('map-pick-bar');
-  const pickFromBtn  = document.getElementById('pick-from-btn');
   const pickToBtn    = document.getElementById('pick-to-btn');
   const pickCloseBtn = document.getElementById('pick-close-btn');
 
-  const _setPickActive = (mode) => {
-    pickFromBtn.classList.toggle('active', mode === 'from');
-    pickToBtn.classList.toggle('active',   mode === 'to');
-  };
-
   const _onMapPick = async (mode, lat, lng) => {
-    const fromEl = document.getElementById('current-location');
-    const toEl   = document.getElementById('destination');
-    const label  = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    const toEl  = document.getElementById('destination');
+    const label = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     try {
       const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, { headers: { 'Accept-Language': 'en-GB' } });
       const data = await res.json();
       const a    = data.address || {};
       const nice = [a.road, a.suburb || a.neighbourhood || a.city_district].filter(Boolean).join(', ') || data.display_name.split(',')[0];
-      if (mode === 'from') { fromEl.value = nice; state.routeStart = [lat, lng]; updateMapStart(nice); setStartMarker([lat, lng], nice); }
-      else                  { toEl.value   = nice; state.routeEnd   = [lat, lng]; updateMapEnd(nice);   setEndMarker([lat, lng], nice); }
+      toEl.value = nice; state.routeEnd = [lat, lng]; updateMapEnd(nice); setEndMarker([lat, lng], nice);
     } catch {
-      if (mode === 'from') { fromEl.value = label; state.routeStart = [lat, lng]; }
-      else                  { toEl.value   = label; state.routeEnd   = [lat, lng]; }
+      toEl.value = label; state.routeEnd = [lat, lng];
     }
-    _syncClearFrom();
     _syncClearTo();
-    _setPickActive(mode === 'from' ? 'to' : null);
-    showToast(mode === 'from' ? 'Start set — now tap to set destination.' : 'Destination set.');
-    if (mode === 'from') enablePickMode('to', _onMapPick);
-    else pickBar.hidden = true;
+    pickBar.hidden = true;
+    showToast('Destination set.');
   };
 
-  // Show pick bar when map area is tapped without pick mode active
+  // Map tap → show pick bar and arm destination pick mode (disabled while a route is active)
   document.getElementById('leaflet-map').addEventListener('click', () => {
-    if (pickBar.hidden) { pickBar.hidden = false; _setPickActive('from'); enablePickMode('from', _onMapPick); }
+    if (document.getElementById('route-result').classList.contains('visible')) {
+      showToast('Clear the destination to set a new one on the map.');
+      return;
+    }
+    if (pickBar.hidden) { pickBar.hidden = false; enablePickMode('to', _onMapPick); }
   }, { capture: false });
 
-  pickFromBtn.addEventListener('click', () => { _setPickActive('from'); enablePickMode('from', _onMapPick); });
-  pickToBtn.addEventListener('click',   () => { _setPickActive('to');   enablePickMode('to',   _onMapPick); });
+  pickToBtn.addEventListener('click',    () => enablePickMode('to', _onMapPick));
   pickCloseBtn.addEventListener('click', () => { pickBar.hidden = true; disablePickMode(); });
 
   document.getElementById('surround-scan-btn').addEventListener('click', () => {

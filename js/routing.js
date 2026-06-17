@@ -113,8 +113,10 @@ const _renderResult = (title, summary, steps) => {
 
 /* ── Main buildRoute ── */
 export const buildRoute = async (destination, mode) => {
-  const dest = destination.trim() || 'Waterloo';
-  const from = document.getElementById('current-location')?.value.trim() || 'London Bridge';
+  const dest = destination.trim();
+  const from = document.getElementById('current-location')?.value.trim();
+  if (!dest) { showToast('Please enter a destination first.'); return; }
+  if (!from) { showToast('Please enter a starting point first.'); return; }
 
   updateMapStart(from);
   updateMapAlert(mode, dest);
@@ -132,7 +134,7 @@ export const buildRoute = async (destination, mode) => {
       // Place markers at true journey endpoints (TfL snaps to nearest stop)
       const jStart = legs[0]?.latlngs?.[0] ?? startLL;
       const jEnd   = legs[legs.length - 1]?.latlngs?.at(-1) ?? endLL;
-      setStartMarker(jStart, from);
+      if (!state.fromIsLive) setStartMarker(jStart, from);
       setEndMarker(jEnd, dest);
 
       const hasDisruption = legs.some((l) => l.isDisrupted);
@@ -154,7 +156,7 @@ export const buildRoute = async (destination, mode) => {
       showToast(`TfL unavailable — trying walking route…`);
       const { latlngs, distanceM, durationS } = await routeOSRM(startLL, endLL);
       drawRoute(latlngs);
-      setStartMarker(startLL, from);
+      if (!state.fromIsLive) setStartMarker(startLL, from);
       setEndMarker(endLL, dest);
       _renderResult(
         `Walking route to ${dest}`,
