@@ -2,7 +2,8 @@ import { userProfile, state } from './state.js';
 import { showToast } from './ui.js';
 import { drawLegs, drawRoute, setStartMarker, setEndMarker, updateAlertCard } from './map.js';
 import { journeyTfL } from './tfl-journey.js';
-import { routeOSRM, fmtDistance, fmtDuration } from './osrm.js';
+import { routeOSRMFoot, routeOSRMDrive, fmtDistance, fmtDuration } from './osrm.js';
+import { routeGraphHopper } from './graphhopper.js';
 
 const NOM = 'https://nominatim.openstreetmap.org/search';
 
@@ -151,19 +152,62 @@ export const buildRoute = async (destination, mode) => {
       showToast(`${duration} min · live TfL route drawn.`);
 
     } catch (tflErr) {
-      // ── Fallback 1: OSRM walking (no public transport, but real geometry) ──
-      console.warn('TfL Journey Planner failed:', tflErr.message);
-      showToast(`TfL unavailable — trying walking route…`);
-      const { latlngs, distanceM, durationS } = await routeOSRM(startLL, endLL);
-      drawRoute(latlngs);
-      if (!state.fromIsLive) setStartMarker(startLL, from);
-      setEndMarker(endLL, dest);
-      _renderResult(
-        `Walking route to ${dest}`,
-        `${fmtDuration(durationS)} · ${fmtDistance(distanceM)}. Live TfL routing unavailable.`,
-        [['fa-person-walking', `Walk to ${dest}`]]
-      );
-      showToast(`${fmtDuration(durationS)} walking — TfL data unavailable.`);
+      console.warn('TfL failed:', tflErr.message);
+
+      // ── Fallback 2: GraphHopper foot ──
+      try {
+        showToast('Calculating walking route…');
+        const { latlngs, distanceM, durationS } = await routeGraphHopper(startLL, endLL);
+        drawRoute(latlngs);
+        if (!state.fromIsLive) setStartMarker(startLL, from);
+        setEndMarker(endLL, dest);
+        _renderResult(
+          `Walking route to ${dest}`,
+          `${fmtDuration(durationS)} · ${fmtDistance(distanceM)}.`,
+          [['fa-person-walking', `Walk to ${dest}`]]
+        );
+        showToast(`${fmtDuration(durationS)} walking.`);
+
+      } catch (ghErr) {
+        console.warn('GraphHopper failed:', ghErr.message);
+
+        // ── Fallback 3: OSRM foot (OSM Germany) ──
+        try {
+          showToast('Trying backup walking router…');
+          const { latlngs, distanceM, durationS } = await routeOSRMFoot(startLL, endLL);
+          drawRoute(latlngs);
+          if (!state.fromIsLive) setStartMarker(startLL, from);
+          setEndMarker(endLL, dest);
+          _renderResult(
+            `Walking route to ${dest}`,
+            `${fmtDuration(durationS)} · ${fmtDistance(distanceM)}.`,
+            [['fa-person-walking', `Walk to ${dest}`]]
+          );
+          showToast(`${fmtDuration(durationS)} walking.`);
+
+        } catch (osrmFErr) {
+          console.warn('OSRM foot failed:', osrmFErr.message);
+
+          // ── Fallback 4: OSRM driving ──
+          try {
+            showToast('Walking route unavailable — trying driving estimate…');
+            const { latlngs, distanceM, durationS } = await routeOSRMDrive(startLL, endLL);
+            drawRoute(latlngs, '#f59e0b');
+            if (!state.fromIsLive) setStartMarker(startLL, from);
+            setEndMarker(endLL, dest);
+            _renderResult(
+              `Driving estimate to ${dest}`,
+              `${fmtDuration(durationS, 'drive')} · ${fmtDistance(distanceM)} — driving estimate only, not a walking or transit route.`,
+              [['fa-car', `Drive to ${dest} (estimate only)`]]
+            );
+            showToast('Driving estimate shown — walking routing unavailable.');
+
+          } catch (osrmDErr) {
+            console.warn('OSRM drive failed:', osrmDErr.message);
+            _staticFallback(from, dest, mode);
+          }
+        }
+      }
     }
 
   } catch (err) {
@@ -174,16 +218,13 @@ export const buildRoute = async (destination, mode) => {
 };
 
 const _staticFallback = (from, dest, mode) => {
-  const isAI = mode === 'AI Agent';
-  const mins = isAI ? 24 : mode === 'Fastest' ? 21 : mode === 'Quiet' ? 29 : 26;
   _renderResult(
-    isAI ? `AI-optimised route to ${dest}` : `${mode} route to ${dest}`,
-    `~${mins} min estimated journey. Live routing unavailable.`,
+    `Route to ${dest}`,
+    'Unable to estimate journey time — all routing sources are currently unavailable.',
     [
-      ['fa-train',          `Travel toward ${dest} — ${mode.toLowerCase()} preference applied.`],
-      ['fa-wheelchair',     'Step-free interchange prioritised where possible.'],
-      ['fa-flag-checkered', `Arrive at ${dest}.`],
+      ['fa-triangle-exclamation', 'Live routing unavailable. Please check your connection and try again.'],
+      ['fa-flag-checkered',       `Destination: ${dest}.`],
     ]
   );
-  showToast('Live routing unavailable — showing estimated route.');
+  showToast('Unable to calculate route — all routing sources unavailable.');
 };
