@@ -214,3 +214,24 @@ export const addFaultMarker = (latlng, name) => {
 export const centreOn = (latlng, zoom = 15) => {
   if (_map) _map.setView(latlng, zoom);
 };
+
+/* ── Tap-on-map pick mode ────────────────────────── */
+let _pickHandler = null;
+
+export const enablePickMode = (mode, onPick) => {
+  if (!_map) return;
+  if (_pickHandler) _map.off('click', _pickHandler);
+  _map.getContainer().style.cursor = 'crosshair';
+  _pickHandler = (e) => {
+    const { lat, lng } = e.latlng;
+    onPick(mode, lat, lng);
+    disablePickMode();
+  };
+  _map.on('click', _pickHandler);
+};
+
+export const disablePickMode = () => {
+  if (!_map) return;
+  if (_pickHandler) { _map.off('click', _pickHandler); _pickHandler = null; }
+  _map.getContainer().style.cursor = '';
+};

@@ -135,14 +135,68 @@
 
 .route-map {
   overflow: hidden;
-  height: 210px;
+  height: 260px;
   position: relative;
   margin-bottom: 14px;
   background: #e8edf2;
+  border-radius: 12px;
+}
+
+/* ── Tap-to-set from/to bar ─── */
+.map-pick-bar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 500;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  pointer-events: none;
+}
+.map-pick-bar[hidden] { display: none; }
+
+.map-pick-btn {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  background: white;
+  color: var(--text-light);
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.map-pick-btn.active {
+  background: var(--primary);
+  color: white;
+}
+.map-pick-btn i { font-size: 0.65rem; }
+
+.map-pick-close {
+  pointer-events: all;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  color: var(--text-light);
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 #leaflet-map {
-  height: 210px; /* explicit px — 100% can resolve to 0 before Leaflet measures the container */
+  height: 260px; /* explicit px — 100% can resolve to 0 before Leaflet measures the container */
   width: 100%;
 }
 

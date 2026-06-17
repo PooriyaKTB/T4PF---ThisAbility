@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent, saveState } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, setEndMarker, centreOn, markAllAvoided, markAllVerified } from '../map.js';
+import { setStartMarker, setEndMarker, centreOn, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
 import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
@@ -172,6 +172,47 @@ export const init = () => {
       setEndMarker([lat, lng], label);
     }
   );
+
+  /* ── Tap-on-map pick mode ── */
+  const pickBar      = document.getElementById('map-pick-bar');
+  const pickFromBtn  = document.getElementById('pick-from-btn');
+  const pickToBtn    = document.getElementById('pick-to-btn');
+  const pickCloseBtn = document.getElementById('pick-close-btn');
+
+  const _setPickActive = (mode) => {
+    pickFromBtn.classList.toggle('active', mode === 'from');
+    pickToBtn.classList.toggle('active',   mode === 'to');
+  };
+
+  const _onMapPick = async (mode, lat, lng) => {
+    const fromEl = document.getElementById('current-location');
+    const toEl   = document.getElementById('destination');
+    const label  = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, { headers: { 'Accept-Language': 'en-GB' } });
+      const data = await res.json();
+      const a    = data.address || {};
+      const nice = [a.road, a.suburb || a.neighbourhood || a.city_district].filter(Boolean).join(', ') || data.display_name.split(',')[0];
+      if (mode === 'from') { fromEl.value = nice; state.routeStart = [lat, lng]; updateMapStart(nice); setStartMarker([lat, lng], nice); }
+      else                  { toEl.value   = nice; state.routeEnd   = [lat, lng]; updateMapEnd(nice);   setEndMarker([lat, lng], nice); }
+    } catch {
+      if (mode === 'from') { fromEl.value = label; state.routeStart = [lat, lng]; }
+      else                  { toEl.value   = label; state.routeEnd   = [lat, lng]; }
+    }
+    _setPickActive(mode === 'from' ? 'to' : null);
+    showToast(mode === 'from' ? 'Start set — now tap to set destination.' : 'Destination set.');
+    if (mode === 'from') enablePickMode('to', _onMapPick);
+    else pickBar.hidden = true;
+  };
+
+  // Show pick bar when map area is tapped without pick mode active
+  document.getElementById('leaflet-map').addEventListener('click', () => {
+    if (pickBar.hidden) { pickBar.hidden = false; _setPickActive('from'); enablePickMode('from', _onMapPick); }
+  }, { capture: false });
+
+  pickFromBtn.addEventListener('click', () => { _setPickActive('from'); enablePickMode('from', _onMapPick); });
+  pickToBtn.addEventListener('click',   () => { _setPickActive('to');   enablePickMode('to',   _onMapPick); });
+  pickCloseBtn.addEventListener('click', () => { pickBar.hidden = true; disablePickMode(); });
 
   document.getElementById('surround-scan-btn').addEventListener('click', () => {
     const list = document.getElementById('surround-alerts-list');
