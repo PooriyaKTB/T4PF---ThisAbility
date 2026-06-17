@@ -5,8 +5,9 @@ const LONDON = [51.5074, -0.1278];
 let _map         = null;
 let _startMarker = null;
 let _endMarker   = null;
+let _liveMarker  = null;
 let _routeLine   = null;
-let _legLines    = [];   // multi-leg lines from TfL Journey Planner
+let _legLines    = [];
 let _faultLayer  = null;
 
 const OSM_TILE   = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -149,6 +150,25 @@ export const clearStartMarker = () => {
   if (_startMarker) { _startMarker.remove(); _startMarker = null; }
 };
 
+/* ── Live user position (pulsing blue dot, independent of route markers) ── */
+export const setLiveMarker = (latlng) => {
+  if (!_map) return;
+  if (_liveMarker) _liveMarker.remove();
+  const icon = L.divIcon({
+    className: '',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    html: '<span class="live-position-dot"></span>',
+  });
+  _liveMarker = L.marker(latlng, { icon, zIndexOffset: 900 })
+    .bindPopup('<strong>You are here</strong>')
+    .addTo(_map);
+};
+
+export const clearLiveMarker = () => {
+  if (_liveMarker) { _liveMarker.remove(); _liveMarker = null; }
+};
+
 export const setEndMarker = (latlng, label = 'Destination') => {
   if (!_map) return;
   if (_endMarker) _endMarker.remove();
@@ -206,6 +226,13 @@ export const clearRoute = () => {
   if (_routeLine)   { _routeLine.remove();   _routeLine   = null; }
   if (_startMarker) { _startMarker.remove(); _startMarker = null; }
   if (_endMarker)   { _endMarker.remove();   _endMarker   = null; }
+};
+
+/* Clears only the polyline(s), leaving markers in place */
+export const clearRouteLine = () => {
+  _legLines.forEach((l) => l.remove());
+  _legLines = [];
+  if (_routeLine) { _routeLine.remove(); _routeLine = null; }
 };
 
 /* ── Fault markers ───────────────────────────────── */

@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent, saveState } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, clearStartMarker, setEndMarker, clearEndMarker, centreOn, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
+import { setStartMarker, clearStartMarker, setEndMarker, clearEndMarker, centreOn, setLiveMarker, clearRouteLine, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
 import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
@@ -22,13 +22,93 @@ export const init = () => {
   const _syncClearFrom = () => { clearFromBtn.hidden = !locationInput.value; };
   const _syncClearTo   = () => { clearToBtn.hidden   = !destinationInput.value; };
 
+  const _clearRouteResult = () => {
+    clearRouteLine();
+    document.getElementById('route-result').classList.remove('visible');
+    document.getElementById('route-steps').innerHTML = '';
+    routeState.textContent = 'Ready';
+  };
+
+  /* ── Shared GPS auto-locate helper ──────────────────────────────────────────
+     quiet : no spinner / no toast  (init, after clear)
+     force : always update From field even if it already has a value
+             (explicit GPS-button tap — user deliberately wants current location) */
+  const _autoLocate = (quiet = false, force = false) => {
+    if (!navigator.geolocation) {
+      if (!quiet) showToast('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    const gpsBtn = document.getElementById('gps-btn');
+    const orig   = gpsBtn.innerHTML;
+
+    if (!quiet) {
+      gpsBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>';
+      gpsBtn.disabled  = true;
+    }
+
+    const _resetBtn = () => { gpsBtn.innerHTML = orig; gpsBtn.disabled = false; };
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude: lat, longitude: lng } }) => {
+        // Always show live position dot and centre map
+        setLiveMarker([lat, lng]);
+        centreOn([lat, lng], 16);
+
+        // Update From field only when forced (GPS button) or field is empty
+        const shouldFill = force || !locationInput.value.trim();
+        if (shouldFill) {
+          state.routeStart = [lat, lng];
+          setStartMarker([lat, lng], 'Your location');
+
+          try {
+            const res  = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+              { headers: { 'Accept-Language': 'en-GB' } }
+            );
+            const data = await res.json();
+            const a    = data.address || {};
+            const label = [a.road, a.suburb || a.neighbourhood || a.city_district]
+              .filter(Boolean).join(', ') || data.display_name.split(',')[0];
+            locationInput.value = label;
+            updateMapStart(label);
+          } catch (_) {
+            locationInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            updateMapStart(locationInput.value);
+          }
+
+          _syncClearFrom();
+        }
+
+        if (!quiet) {
+          showToast(shouldFill ? 'Current location set.' : 'Jumped to your location.');
+          _resetBtn();
+        }
+      },
+      (err) => {
+        if (!quiet) {
+          const msgs = {
+            1: 'Location access denied — enable it in your browser settings.',
+            2: 'Location unavailable. Check your connection and try again.',
+            3: 'Location request timed out. Try again.',
+          };
+          showToast(msgs[err.code] || 'Could not get your location.');
+          _resetBtn();
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
+  /* Clear From → wipe route, re-detect current location */
   clearFromBtn.addEventListener('click', () => {
     locationInput.value = '';
     state.routeStart = null;
     updateMapStart('');
     clearStartMarker();
+    _clearRouteResult();
     _syncClearFrom();
-    locationInput.focus();
+    _autoLocate(false, false);
   });
 
   clearToBtn.addEventListener('click', () => {
@@ -37,77 +117,13 @@ export const init = () => {
     updateMapEnd('');
     updateMapAlert(state.selectedMode, '');
     clearEndMarker();
+    _clearRouteResult();
     _syncClearTo();
     destinationInput.focus();
   });
 
-  document.getElementById('gps-btn').addEventListener('click', () => {
-    if (!navigator.geolocation) {
-      showToast('Geolocation is not supported by your browser.');
-      return;
-    }
-
-    const gpsBtn = document.getElementById('gps-btn');
-    const orig   = gpsBtn.innerHTML;
-
-    gpsBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>';
-    gpsBtn.disabled  = true;
-
-    const _resetBtn = () => { gpsBtn.innerHTML = orig; gpsBtn.disabled = false; };
-
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords: { latitude: lat, longitude: lng } }) => {
-        state.routeStart = [lat, lng];
-        centreOn([lat, lng], 16);
-        setStartMarker([lat, lng], 'Your location');
-
-        // Reverse-geocode via Nominatim (free, no key required)
-        try {
-          const res  = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-            { headers: { 'Accept-Language': 'en-GB' } }
-          );
-          const data = await res.json();
-          const a    = data.address || {};
-          const label = [a.road, a.suburb || a.neighbourhood || a.city_district]
-            .filter(Boolean).join(', ') || data.display_name.split(',')[0];
-          locationInput.value = label;
-          updateMapStart(label);
-        } catch (_) {
-          locationInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-          updateMapStart(locationInput.value);
-        }
-        _syncClearFrom();
-        showToast('Current location set.');
-        _resetBtn();
-      },
-      (err) => {
-        const msgs = {
-          1: 'Location access denied — enable it in your browser settings.',
-          2: 'Location unavailable. Check your connection and try again.',
-          3: 'Location request timed out. Try again.',
-        };
-        showToast(msgs[err.code] || 'Could not get your location.');
-        _resetBtn();
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
-  });
-
-  document.getElementById('swap-btn').addEventListener('click', () => {
-    const fromEl = locationInput;
-    const toEl   = destinationInput;
-    const tmpVal = fromEl.value;
-    fromEl.value = toEl.value;
-    toEl.value   = tmpVal;
-    const tmpCoords  = state.routeStart;
-    state.routeStart = state.routeEnd;
-    state.routeEnd   = tmpCoords;
-    updateMapStart(fromEl.value);
-    updateMapEnd(toEl.value);
-    _syncClearFrom();
-    _syncClearTo();
-  });
+  /* GPS button: force=true so it always jumps + fills From, even if field has a value */
+  document.getElementById('gps-btn').addEventListener('click', () => _autoLocate(false, true));
 
   locationInput.addEventListener('input', (e) => {
     state.routeStart = null;
@@ -270,4 +286,7 @@ export const init = () => {
       showToast('Scan complete. 3 proximity alerts detected on your route.');
     }, (surroundAlertsData.length + 1) * 1000);
   });
+
+  /* Auto-detect current location on load (silent — no spinner/toast) */
+  _autoLocate(true);
 };
