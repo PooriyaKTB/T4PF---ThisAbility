@@ -53,8 +53,8 @@
   }
 
   .content {
-    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 96px);
-    scroll-padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 96px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+    scroll-padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
   }
 
   nav {
