@@ -56,6 +56,20 @@ header {
   padding: 40px 20px 18px;
   border-bottom-left-radius: 22px;
   border-bottom-right-radius: 22px;
+  transition: padding 0.25s ease;
+  flex-shrink: 0;
+}
+
+/* Collapsed state — triggered by JS when content is scrolled */
+header.collapsed {
+  padding-top: 14px;
+  padding-bottom: 10px;
+}
+
+header.collapsed #screen-heading,
+header.collapsed #screen-subtitle,
+header.collapsed .status-row {
+  display: none;
 }
 
 .header-top {

@@ -12,18 +12,24 @@
 
 /* Smartphone: strip the frame, fill the screen natively */
 @media (max-width: 520px) {
+  html, body {
+    height: 100%;
+    /* Prevents elastic bounce that can reveal the page background behind the app */
+    overscroll-behavior: none;
+  }
+
   body {
     padding: 0;
     background: var(--bg-color);
     align-items: flex-start;
   }
 
-  /* position:fixed + inset:0 fills the visible viewport regardless of the
-     browser toolbar state, letting the toolbar retract freely without
-     causing layout shifts or the page being cut off. */
+  /* Fill the full dynamic viewport — adjusts as browser chrome shows/hides */
   .phone-frame {
     position: fixed;
     inset: 0;
+    /* dvh adjusts dynamically as the iOS toolbar shows/hides */
+    height: 100dvh;
     width: 100%;
     min-height: unset;
     border-radius: 0;
@@ -37,15 +43,18 @@
 
   header {
     border-radius: 0;
-    padding-top: 52px; /* space below status bar */
+    /* Use device safe-area-inset-top so gradient bleeds behind translucent status bar */
+    padding-top: calc(env(safe-area-inset-top, 44px) + 10px);
   }
 
   .content {
-    padding-bottom: 96px; /* room above nav on real devices */
+    /* Extra bottom padding so last card clears the nav bar */
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 86px);
   }
 
   nav {
     border-radius: 0;
-    padding-bottom: 28px; /* safe area for home indicator */
+    /* Home indicator safe area */
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 8px);
   }
 }

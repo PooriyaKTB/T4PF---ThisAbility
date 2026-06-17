@@ -5,6 +5,12 @@ const phoneFrame = document.getElementById('phone-frame');
 const toast      = document.getElementById('toast');
 const toastMsg   = document.getElementById('toast-message');
 const content    = document.getElementById('content');
+const header     = document.querySelector('header');
+
+// Collapse header when user scrolls content down, restore on scroll-to-top
+content.addEventListener('scroll', () => {
+  header.classList.toggle('collapsed', content.scrollTop > 40);
+}, { passive: true });
 
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
 export const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || 'Maya';
