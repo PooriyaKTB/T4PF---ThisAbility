@@ -37,3 +37,8 @@
   border: 1px solid #bfdbfe;
   background: #eff6ff;
 }
+
+.logout-card {
+  margin-top: 8px;
+  border-color: rgba(220, 38, 38, 0.2);
+}

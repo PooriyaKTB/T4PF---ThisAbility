@@ -601,6 +601,33 @@
               </div>
             </div>
           </div>
+
+          <div class="card logout-card">
+            <button class="danger-btn" type="button" id="logout-btn" style="width:100%;">
+              <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+              Sign out &amp; clear data
+            </button>
+            <p class="muted" style="font-size:0.7rem;margin-top:10px;text-align:center;">All data lives on-device only. Signing out removes your profile and settings permanently.</p>
+
+            <div id="logout-confirm" hidden>
+              <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+              <p style="font-size:0.82rem;font-weight:600;color:var(--text-main);margin-bottom:4px;">
+                <i class="fas fa-triangle-exclamation" style="color:var(--danger);" aria-hidden="true"></i>
+                Are you sure?
+              </p>
+              <p class="muted" style="font-size:0.72rem;margin-bottom:12px;">Your profile, preferences, and saved data will be permanently deleted from this device.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button class="secondary-btn" type="button" id="logout-cancel-btn">
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                  Cancel
+                </button>
+                <button class="danger-btn" type="button" id="logout-confirm-btn">
+                  <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                  Yes, sign out
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
 

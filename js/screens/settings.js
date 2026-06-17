@@ -1,4 +1,4 @@
-import { userProfile, state, saveProfile, saveState, clearProfile } from '../state.js';
+import { userProfile, state, saveProfile, saveState, clearProfile, clearAll } from '../state.js';
 import { showToast, setScreen, updateProfileUi, syncModeButtons, firstName } from '../ui.js';
 
 export const init = () => {
@@ -53,6 +53,22 @@ export const init = () => {
     profileCompleteness.textContent = '86';
     updateProfileUi();
     showToast(`Profile reset to your original settings, ${firstName()}.`);
+  });
+
+  const logoutConfirm = document.getElementById('logout-confirm');
+
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    logoutConfirm.hidden = false;
+    logoutConfirm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.getElementById('logout-cancel-btn').addEventListener('click', () => {
+    logoutConfirm.hidden = true;
+  });
+
+  document.getElementById('logout-confirm-btn').addEventListener('click', () => {
+    clearAll();
+    location.reload();
   });
 
   document.querySelectorAll('.setting-list .switch').forEach((btn) => {

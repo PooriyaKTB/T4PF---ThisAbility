@@ -32,6 +32,13 @@ export const clearProfile = () => {
   try { localStorage.removeItem(PROFILE_KEY); } catch (_) {}
 };
 
+export const clearAll = () => {
+  try {
+    localStorage.removeItem(PROFILE_KEY);
+    localStorage.removeItem(STATE_KEY);
+  } catch (_) {}
+};
+
 export const userProfile = {
   name: '',
   email: '',
