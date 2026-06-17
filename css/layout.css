@@ -170,6 +170,11 @@ header.collapsed .status-row {
   padding: 18px 18px 80px;
   scroll-behavior: smooth;
   scroll-padding-bottom: 80px;
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge legacy */
+}
+.content::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / modern Edge */
 }
 
 .screen {
