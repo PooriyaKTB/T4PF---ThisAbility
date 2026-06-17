@@ -3,7 +3,7 @@
 
 /* JS modules change frequently during development — always fetch from network.
    Only cache static assets (images, CSS) for performance. */
-const ASSET_CACHE = 'ta-v5-assets';
+const ASSET_CACHE = 'ta-v8-assets';
 
 const STATIC_ASSETS = [
   './assets/logo-icon.png',

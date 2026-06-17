@@ -145,12 +145,20 @@ export const setStartMarker = (latlng, label = 'Start') => {
     .addTo(_map);
 };
 
+export const clearStartMarker = () => {
+  if (_startMarker) { _startMarker.remove(); _startMarker = null; }
+};
+
 export const setEndMarker = (latlng, label = 'Destination') => {
   if (!_map) return;
   if (_endMarker) _endMarker.remove();
   _endMarker = L.circleMarker(latlng, END_STYLE)
     .bindPopup(`<strong>Destination</strong><br>${label}`)
     .addTo(_map);
+};
+
+export const clearEndMarker = () => {
+  if (_endMarker) { _endMarker.remove(); _endMarker = null; }
 };
 
 /* ── Route polyline ──────────────────────────────── */

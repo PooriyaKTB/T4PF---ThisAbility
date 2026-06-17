@@ -82,15 +82,20 @@
             <img src="assets/logo-icon.png" alt="" aria-hidden="true" style="width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1);flex-shrink:0;" />
             <span class="logo-text">ThisAbility</span>
           </div>
-          <button
-            class="user-profile"
-            type="button"
-            id="profile-open"
-            aria-label="Open profile"
-          >
-            <i class="fas fa-user-circle" aria-hidden="true"></i>
-            <span id="user-chip-name"></span>
-          </button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" id="dark-mode-toggle" class="dark-mode-btn" aria-label="Toggle dark mode" aria-pressed="false">
+              <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+            <button
+              class="user-profile"
+              type="button"
+              id="profile-open"
+              aria-label="Open profile"
+            >
+              <i class="fas fa-user-circle" aria-hidden="true"></i>
+              <span id="user-chip-name"></span>
+            </button>
+          </div>
         </div>
         <h2 id="screen-heading"></h2>
         <p class="small" id="screen-subtitle" style="margin-top: 5px; opacity: 0.9">
@@ -185,7 +190,7 @@
             <div id="leaflet-map"></div>
             <div id="fault-badge" class="fault-badge" hidden aria-live="polite">
               <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
-              <span data-count>0</span>&thinsp;line disruption<span data-plural>s</span>&thinsp;live
+              <span><span data-count>0</span> line disruption<span data-plural>s</span> live</span>
             </div>
           </div>
           <!-- Hidden label refs kept for routing.js — wired to Leaflet markers in Step 6 -->

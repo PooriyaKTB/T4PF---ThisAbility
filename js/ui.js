@@ -1,4 +1,4 @@
-import { userProfile, state, screenCopy } from './state.js';
+import { userProfile, state, screenCopy, saveProfile } from './state.js';
 import { initMap } from './map.js';
 
 const phoneFrame = document.getElementById('phone-frame');
@@ -48,28 +48,39 @@ content.addEventListener('touchmove', (e) => {
 
 content.addEventListener('touchend', () => { _touchY0 = null; }, { passive: true });
 
-/* ── Swipe left/right to change screens ── */
+/* ── Swipe left/right to change screens ──
+   Attached to phone-frame (not content) so Leaflet map touch events don't block it. */
 const SCREENS = ['explore', 'passport', 'guardian', 'settings'];
 let _swipeX0 = null;
 let _swipeY0 = null;
 
-content.addEventListener('touchstart', (e) => {
+phoneFrame.addEventListener('touchstart', (e) => {
   _swipeX0 = e.touches[0].clientX;
   _swipeY0 = e.touches[0].clientY;
 }, { passive: true });
 
-content.addEventListener('touchend', (e) => {
+phoneFrame.addEventListener('touchend', (e) => {
   if (_swipeX0 === null) return;
   const dx = e.changedTouches[0].clientX - _swipeX0;
   const dy = e.changedTouches[0].clientY - _swipeY0;
   _swipeX0 = null;
   _swipeY0 = null;
-  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+  // Require at least 50px horizontal and more horizontal than vertical
+  if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
   const idx = SCREENS.indexOf(state.currentScreen);
   if (idx === -1) return;
   const next = dx < 0 ? SCREENS[idx + 1] : SCREENS[idx - 1];
   if (next) setScreen(next);
 }, { passive: true });
+
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+  userProfile.darkMode = !userProfile.darkMode;
+  phoneFrame.classList.toggle('dark', userProfile.darkMode);
+  const btn = document.getElementById('dark-mode-toggle');
+  btn.setAttribute('aria-pressed', String(userProfile.darkMode));
+  saveProfile();
+  showToast(userProfile.darkMode ? 'Dark mode on.' : 'Dark mode off.');
+});
 
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
 export const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || 'Maya';
@@ -131,6 +142,9 @@ export const updateProfileUi = () => {
   phoneFrame.classList.toggle('large-text',   userProfile.text === 'large');
   phoneFrame.classList.toggle('high-contrast', userProfile.contrast === 'high');
   phoneFrame.classList.toggle('calm-ui',       userProfile.contrast === 'calm');
+  phoneFrame.classList.toggle('dark',          userProfile.darkMode === true);
+  const dmBtn = document.getElementById('dark-mode-toggle');
+  if (dmBtn) dmBtn.setAttribute('aria-pressed', String(userProfile.darkMode === true));
 
   state.selectedMode = userProfile.mobility;
   syncModeButtons();

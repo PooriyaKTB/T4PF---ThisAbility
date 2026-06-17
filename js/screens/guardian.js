@@ -13,12 +13,6 @@ const runGuardianSim = (type, source = 'test') => {
   const resultEl  = document.getElementById('guardian-sim-result');
   const contentEl = document.getElementById('content');
   resultEl.innerHTML = '';
-  // offsetTop is relative to phone-frame, not content — use getBoundingClientRect instead
-  setTimeout(() => {
-    const r = resultEl.getBoundingClientRect();
-    const c = contentEl.getBoundingClientRect();
-    contentEl.scrollTo({ top: contentEl.scrollTop + (r.top - c.top) - 16, behavior: 'smooth' });
-  }, 50);
   const contact = userProfile.guardian || 'your emergency contact';
 
   if (source === 'sensor') {
@@ -95,10 +89,7 @@ const runGuardianSim = (type, source = 'test') => {
       item.style.borderLeft = `3px solid ${color}`;
       item.innerHTML = `<i class="fas ${icon}" style="color:${color};margin-right:6px;" aria-hidden="true"></i>${msg}`;
       resultEl.appendChild(item);
-      // Scroll each new step into view as it appears
-      const r = item.getBoundingClientRect();
-      const c = contentEl.getBoundingClientRect();
-      contentEl.scrollTo({ top: contentEl.scrollTop + (r.bottom - c.bottom) + 12, behavior: 'smooth' });
+      contentEl.scrollTo({ top: contentEl.scrollHeight, behavior: 'smooth' });
     }, delay);
   });
 

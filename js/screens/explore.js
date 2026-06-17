@@ -1,7 +1,7 @@
 import { userProfile, state, moduleContent, saveState } from '../state.js';
 import { showToast, syncModeButtons } from '../ui.js';
 import { buildRoute, updateMapAlert, updateMapStart, updateMapEnd } from '../routing.js';
-import { setStartMarker, setEndMarker, centreOn, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
+import { setStartMarker, clearStartMarker, setEndMarker, clearEndMarker, centreOn, enablePickMode, disablePickMode, markAllAvoided, markAllVerified } from '../map.js';
 import { createAutocomplete } from '../autocomplete.js';
 
 const surroundAlertsData = [
@@ -26,6 +26,7 @@ export const init = () => {
     locationInput.value = '';
     state.routeStart = null;
     updateMapStart('');
+    clearStartMarker();
     _syncClearFrom();
     locationInput.focus();
   });
@@ -35,6 +36,7 @@ export const init = () => {
     state.routeEnd = null;
     updateMapEnd('');
     updateMapAlert(state.selectedMode, '');
+    clearEndMarker();
     _syncClearTo();
     destinationInput.focus();
   });

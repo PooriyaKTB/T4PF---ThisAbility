@@ -13,3 +13,205 @@
   --warning: #b45309;
   --shadow: 0 12px 30px rgba(31, 41, 55, 0.14);
 }
+
+.phone-frame.dark {
+  --bg-color: #0f172a;
+  --surface: #1e293b;
+  --surface-soft: #1e2d45;
+  --text-main: #e2e8f0;
+  --text-light: #94a3b8;
+  --border: #334155;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  /* Set color explicitly so all inheriting children get the dark text colour,
+     not the body-level #172033 that body { color: var(--text-main) } computes. */
+  color: var(--text-main);
+  background-color: var(--bg-color);
+}
+
+/* ── Dark mode: hard-coded backgrounds that need overriding ── */
+
+/* Cards and metrics */
+.phone-frame.dark .card,
+.phone-frame.dark .module-btn,
+.phone-frame.dark .metric {
+  border-color: var(--border);
+}
+
+/* Mode chips */
+.phone-frame.dark .mode-chip {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.phone-frame.dark .mode-chip.active {
+  background: #1e3a5f;
+  color: #93c5fd;
+  border-color: #3b82f6;
+}
+.phone-frame.dark .mode-chip--ai {
+  color: #5eead4;
+  border-color: #0d9488;
+}
+.phone-frame.dark .mode-chip--ai.active {
+  background: #042f2e;
+  color: #5eead4;
+}
+
+/* Alert box */
+.phone-frame.dark .alert-box {
+  background: #1f0f0f;
+}
+
+/* Secondary and danger buttons */
+.phone-frame.dark .secondary-btn {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+.phone-frame.dark .danger-btn {
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+/* Routing inputs */
+.phone-frame.dark .routing-input {
+  background: var(--surface-soft);
+  border-color: var(--border);
+}
+
+/* Scan alert items, swap button, autocomplete */
+.phone-frame.dark .scan-alert-item {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.phone-frame.dark .swap-btn {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+.phone-frame.dark .ac-list {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.phone-frame.dark .ac-item {
+  border-bottom-color: var(--border);
+}
+.phone-frame.dark .ac-item:hover,
+.phone-frame.dark .ac-item.active {
+  background: var(--surface-soft);
+}
+
+/* Map pick bar */
+.phone-frame.dark .map-pick-btn {
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.phone-frame.dark .map-pick-btn.active {
+  background: var(--primary);
+  color: white;
+}
+.phone-frame.dark .map-pick-close {
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text-main);
+}
+
+/* Step icon */
+.phone-frame.dark .step-icon {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+/* Disruption verify/avoid buttons */
+.phone-frame.dark .disruption-verify-btn {
+  background: #2d2008;
+  color: #fcd34d;
+}
+.phone-frame.dark .disruption-verify-btn.verified {
+  background: #052e16;
+  color: #6ee7b7;
+}
+.phone-frame.dark .disruption-avoid-btn {
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+.phone-frame.dark .disruption-avoid-btn.avoided {
+  background: #1e1b4b;
+  color: #a5b4fc;
+}
+
+/* Nav bar */
+.phone-frame.dark nav {
+  background: rgba(15, 23, 42, 0.88);
+}
+
+/* Guardian simulate buttons with hard-coded inline backgrounds */
+.phone-frame.dark #anxiety-test {
+  background: #312107 !important;
+  color: #fde68a !important;
+}
+.phone-frame.dark #panic-test {
+  background: #1e1b4b !important;
+  color: #c4b5fd !important;
+}
+
+/* Step-icon inline background colours in Guardian "What monitors" list */
+.phone-frame.dark .step-icon {
+  background: var(--surface-soft) !important;
+}
+
+/* Form inputs — background:white is hardcoded in components.css; in dark mode
+   --text-main becomes #e2e8f0 (light) on white background = invisible text */
+.phone-frame.dark .form-field input,
+.phone-frame.dark .form-field select {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+.phone-frame.dark .form-field input::placeholder {
+  color: var(--text-light);
+}
+
+/* Preference preview in settings (hardcoded #eff6ff light-blue background) */
+.phone-frame.dark .preference-preview {
+  background: var(--surface-soft);
+  border-color: var(--border);
+}
+
+/* Module buttons: <button> UA stylesheet sets color:ButtonText (black), overriding CSS
+   inheritance from .phone-frame.dark. Must set color explicitly here to get light text. */
+.phone-frame.dark .module-btn {
+  color: var(--text-main);
+}
+.phone-frame.dark .module-btn h4 {
+  color: var(--text-main);
+}
+.phone-frame.dark .module-btn p {
+  color: var(--text-light);
+}
+
+/* Active module button and detail panel (hardcoded #f7fbff / #f8fbff) */
+.phone-frame.dark .module-btn.active {
+  background: var(--surface-soft);
+}
+.phone-frame.dark .module-detail {
+  background: var(--surface-soft);
+  border-color: var(--border);
+}
+
+/* Route map loading background (shows before OSM tiles paint) */
+.phone-frame.dark .route-map {
+  background: #1e2d45;
+}
+
+/* Chips — hardcoded light backgrounds become invisible in dark mode */
+.phone-frame.dark .chip {
+  background: #052e16;
+  color: #6ee7b7;
+}
+.phone-frame.dark .chip.warning {
+  background: #2d2008;
+  color: #fcd34d;
+}
+.phone-frame.dark .chip.info {
+  background: #1e3a5f;
+  color: #93c5fd;
+}

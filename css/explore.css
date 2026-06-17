@@ -1,3 +1,16 @@
+/* Only when explore is the active screen: flex column so route-map can flex-grow to nav bar.
+   Must use .screen.active so this doesn't override display:none on inactive state. */
+.screen.active[data-screen="explore"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Prevent the routing form from shrinking when route-map has flex:1 */
+#route-form {
+  flex-shrink: 0;
+}
+
 .scan-alert-item {
   margin-top: 8px;
   padding: 10px;
@@ -155,9 +168,10 @@
 
 .route-map {
   overflow: hidden;
-  height: 260px;
+  flex: 1;          /* fills remaining height so map reaches the frosted nav bar */
+  min-height: 220px;
   position: relative;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   background: #e8edf2;
   border-radius: 12px;
 }
@@ -168,7 +182,7 @@
   top: 8px;
   left: 8px;
   right: 8px;
-  z-index: 500;
+  z-index: 600; /* above fault-badge (500) so pick bar always wins the overlap */
   display: flex;
   gap: 6px;
   align-items: center;
@@ -216,7 +230,8 @@
 }
 
 #leaflet-map {
-  height: 260px; /* explicit px — 100% can resolve to 0 before Leaflet measures the container */
+  height: 100%;
+  min-height: 220px; /* fallback so Leaflet's offsetHeight===0 guard doesn't bail before 100% resolves */
   width: 100%;
 }
 
@@ -226,9 +241,16 @@
   box-sizing: content-box;
 }
 
+.leaflet-control-attribution {
+  font-size: 0.5rem !important;
+  padding: 1px 4px !important;
+  line-height: 1.2 !important;
+  opacity: 0.7;
+}
+
 .fault-badge {
   position: absolute;
-  bottom: 8px;
+  bottom: 8px; /* moved from top — pick bar is at top: 8px; both are now visible simultaneously */
   left: 8px;
   z-index: 500;
   display: flex;
@@ -240,6 +262,7 @@
   border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 600;
+  white-space: nowrap; /* prevent "disruption s live" line-break inside the badge */
   backdrop-filter: blur(4px);
   pointer-events: none;
 }

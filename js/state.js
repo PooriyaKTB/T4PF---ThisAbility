@@ -46,6 +46,7 @@ export const userProfile = {
   alert: 'Haptic first',
   text: 'standard',
   contrast: 'standard',
+  darkMode: false,
 };
 
 export const state = {
