@@ -55,6 +55,7 @@ let _swipeX0 = null;
 let _swipeY0 = null;
 
 phoneFrame.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#leaflet-map')) { _swipeX0 = null; return; }
   _swipeX0 = e.touches[0].clientX;
   _swipeY0 = e.touches[0].clientY;
 }, { passive: true });
