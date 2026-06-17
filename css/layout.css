@@ -72,7 +72,8 @@ header.collapsed .header-top {
 
 header.collapsed #screen-heading,
 header.collapsed #screen-subtitle,
-header.collapsed .status-row {
+header.collapsed .status-row,
+header.collapsed .logo-text {
   display: none;
 }
 
