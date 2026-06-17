@@ -60,10 +60,14 @@ header {
   flex-shrink: 0;
 }
 
-/* Collapsed state — triggered by JS when content is scrolled */
+/* Collapsed state — logo + user chip stay, hero text slides away */
 header.collapsed {
   padding-top: 14px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+}
+
+header.collapsed .header-top {
+  margin-bottom: 0; /* remove gap when content below is hidden */
 }
 
 header.collapsed #screen-heading,

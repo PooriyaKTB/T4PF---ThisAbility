@@ -43,8 +43,13 @@
 
   header {
     border-radius: 0;
-    /* Use device safe-area-inset-top so gradient bleeds behind translucent status bar */
+    /* Gradient bleeds behind translucent status bar */
     padding-top: calc(env(safe-area-inset-top, 44px) + 10px);
+  }
+
+  header.collapsed {
+    padding-top: calc(env(safe-area-inset-top, 44px) + 6px);
+    padding-bottom: 12px;
   }
 
   .content {

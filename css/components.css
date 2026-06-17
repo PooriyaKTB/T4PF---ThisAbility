@@ -59,31 +59,33 @@
   gap: 10px;
 }
 
-/* ── Mode pills — horizontal scroll row of compact chips ── */
+/* ── Mode pills — 2×2 grid, AI Agent full width below ── */
 .mode-pills {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 6px;
-  overflow-x: auto;
-  padding: 2px 0 6px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  padding: 2px 0 4px;
   margin-bottom: 4px;
 }
-.mode-pills::-webkit-scrollbar { display: none; }
+
+.mode-chip--ai {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
 
 .mode-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   border: 1.5px solid var(--border);
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 7px 6px;
   background: white;
   color: var(--text-main);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   white-space: nowrap;
-  flex-shrink: 0;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
