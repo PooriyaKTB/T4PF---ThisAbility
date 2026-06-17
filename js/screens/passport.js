@@ -27,6 +27,12 @@ export const init = () => {
         <p class="muted" style="margin-top:4px;">BLE broadcasting is paused. Enable it to allow venues to read your access hints.</p>
       </div>`;
       showToast('Venue scan blocked — BLE broadcasting is paused.');
+      const contentEl = document.getElementById('content');
+      setTimeout(() => {
+        const r = resultEl.getBoundingClientRect();
+        const c = contentEl.getBoundingClientRect();
+        contentEl.scrollTo({ top: contentEl.scrollTop + (r.top - c.top) - 16, behavior: 'smooth' });
+      }, 50);
       return;
     }
 
@@ -59,7 +65,12 @@ export const init = () => {
         </div>
       </div>`;
       showToast('Venue received your access hints. Sensitive data protected.');
-      setTimeout(() => resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+      const contentEl = document.getElementById('content');
+      setTimeout(() => {
+        const r = resultEl.getBoundingClientRect();
+        const c = contentEl.getBoundingClientRect();
+        contentEl.scrollTo({ top: contentEl.scrollTop + (r.top - c.top) - 16, behavior: 'smooth' });
+      }, 50);
     }, 2000);
   });
 };
