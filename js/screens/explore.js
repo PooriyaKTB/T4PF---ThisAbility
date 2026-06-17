@@ -180,6 +180,12 @@ export const init = () => {
     showToast('Thanks. Your anonymous verification improved route confidence.');
   });
 
+  document.querySelector('.modules-disclosure').addEventListener('toggle', (e) => {
+    if (e.target.open) {
+      setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+  });
+
   document.querySelectorAll('.module-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const module = moduleContent[btn.dataset.module];
@@ -193,6 +199,8 @@ export const init = () => {
       if (moduleDetail) moduleDetail.style.display = isAlerts ? 'none' : 'block';
       if (!isAlerts) document.getElementById('surround-alerts-list').innerHTML = '';
       showToast(`${module.title} selected.`);
+      const revealedEl = isAlerts ? surroundCard : moduleDetail;
+      if (revealedEl) setTimeout(() => revealedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
     });
   });
 
@@ -276,6 +284,7 @@ export const init = () => {
         item.style.borderLeft = `3px solid ${color}`;
         item.innerHTML = `<i class="fas ${icon}" style="color:${color}; margin-right:6px;" aria-hidden="true"></i><strong>${label}:</strong> ${text}`;
         list.appendChild(item);
+        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         showToast(`${label} — ${text.split('—')[0].trim()}`);
       }, (i + 1) * 1000);
     });
