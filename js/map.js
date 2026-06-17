@@ -11,10 +11,15 @@ let _routeLine   = null;
 let _legLines    = [];
 let _faultLayer  = null;
 
-const _isDark = () => document.querySelector('.phone-frame')?.classList.contains('dark') ?? false;
+const _tileUrl = () => {
+  const cl = document.querySelector('.phone-frame')?.classList;
+  if (cl?.contains('high-contrast')) return TILE_OSM;
+  return cl?.contains('dark') ? TILE_DARK : TILE_LIGHT;
+};
 
 const TILE_LIGHT  = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 const TILE_DARK   = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_OSM    = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_CREDIT = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
 
 const START_STYLE = { radius: 9, fillColor: '#2563eb', color: '#fff', weight: 2.5, fillOpacity: 1 };
@@ -37,14 +42,14 @@ const _create = () => {
     attributionControl: true,
   });
 
-  _tileLayer = L.tileLayer(_isDark() ? TILE_DARK : TILE_LIGHT, { attribution: TILE_CREDIT, maxZoom: 19 }).addTo(_map);
+  _tileLayer = L.tileLayer(_tileUrl(), { attribution: TILE_CREDIT, maxZoom: 19 }).addTo(_map);
   _faultLayer = L.layerGroup().addTo(_map);
 
   // Swap tile theme whenever dark mode is toggled
   const frame = document.querySelector('.phone-frame');
   if (frame) {
     new MutationObserver(() => {
-      if (_tileLayer) _tileLayer.setUrl(_isDark() ? TILE_DARK : TILE_LIGHT);
+      if (_tileLayer) _tileLayer.setUrl(_tileUrl());
     }).observe(frame, { attributes: true, attributeFilter: ['class'] });
   }
 
