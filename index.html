@@ -119,6 +119,9 @@
               <div class="routing-input" style="position:relative;">
                 <i class="fas fa-circle-dot" aria-hidden="true" style="color:var(--primary);"></i>
                 <input id="current-location" type="text" placeholder="From — your start location" style="flex:1;" />
+                <button type="button" id="clear-from-btn" class="input-clear-btn" aria-label="Clear start location" hidden>
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
                 <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
                   <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
                 </button>
@@ -134,6 +137,9 @@
                   placeholder="Where to? (e.g. Waterloo Station)"
                   autocomplete="off"
                 />
+                <button type="button" id="clear-to-btn" class="input-clear-btn" aria-label="Clear destination" hidden>
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
               </div>
             </div>
             <div class="mode-pills" role="group" aria-label="Route preference">

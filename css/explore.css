@@ -133,6 +133,26 @@
   color: var(--text-main);
 }
 
+.input-clear-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  color: var(--text-light);
+  font-size: 0.78rem;
+  cursor: pointer;
+  opacity: 0.65;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: opacity 0.15s, background 0.15s;
+}
+.input-clear-btn:hover { opacity: 1; background: rgba(0,0,0,0.07); }
+
 .route-map {
   overflow: hidden;
   height: 260px;

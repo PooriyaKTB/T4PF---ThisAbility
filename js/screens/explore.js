@@ -12,9 +12,32 @@ const surroundAlertsData = [
 
 export const init = () => {
   const destinationInput = document.getElementById('destination');
+  const locationInput    = document.getElementById('current-location');
   const routeState       = document.getElementById('route-state');
   const alertStatus      = document.getElementById('alert-status');
   const crowdCount       = document.getElementById('crowd-count');
+  const clearFromBtn     = document.getElementById('clear-from-btn');
+  const clearToBtn       = document.getElementById('clear-to-btn');
+
+  const _syncClearFrom = () => { clearFromBtn.hidden = !locationInput.value; };
+  const _syncClearTo   = () => { clearToBtn.hidden   = !destinationInput.value; };
+
+  clearFromBtn.addEventListener('click', () => {
+    locationInput.value = '';
+    state.routeStart = null;
+    updateMapStart('');
+    _syncClearFrom();
+    locationInput.focus();
+  });
+
+  clearToBtn.addEventListener('click', () => {
+    destinationInput.value = '';
+    state.routeEnd = null;
+    updateMapEnd('');
+    updateMapAlert(state.selectedMode, '');
+    _syncClearTo();
+    destinationInput.focus();
+  });
 
   document.getElementById('gps-btn').addEventListener('click', () => {
     if (!navigator.geolocation) {
@@ -22,9 +45,8 @@ export const init = () => {
       return;
     }
 
-    const gpsBtn       = document.getElementById('gps-btn');
-    const locationInput = document.getElementById('current-location');
-    const orig         = gpsBtn.innerHTML;
+    const gpsBtn = document.getElementById('gps-btn');
+    const orig   = gpsBtn.innerHTML;
 
     gpsBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>';
     gpsBtn.disabled  = true;
@@ -53,7 +75,7 @@ export const init = () => {
           locationInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
           updateMapStart(locationInput.value);
         }
-
+        _syncClearFrom();
         showToast('Current location set.');
         _resetBtn();
       },
@@ -71,8 +93,8 @@ export const init = () => {
   });
 
   document.getElementById('swap-btn').addEventListener('click', () => {
-    const fromEl = document.getElementById('current-location');
-    const toEl   = document.getElementById('destination');
+    const fromEl = locationInput;
+    const toEl   = destinationInput;
     const tmpVal = fromEl.value;
     fromEl.value = toEl.value;
     toEl.value   = tmpVal;
@@ -81,17 +103,21 @@ export const init = () => {
     state.routeEnd   = tmpCoords;
     updateMapStart(fromEl.value);
     updateMapEnd(toEl.value);
+    _syncClearFrom();
+    _syncClearTo();
   });
 
-  document.getElementById('current-location').addEventListener('input', (e) => {
-    state.routeStart = null; // clear stored coords when user edits manually
+  locationInput.addEventListener('input', (e) => {
+    state.routeStart = null;
     updateMapStart(e.target.value);
+    _syncClearFrom();
   });
 
   destinationInput.addEventListener('input', (e) => {
-    state.routeEnd = null; // clear stored coords when user edits manually
+    state.routeEnd = null;
     updateMapEnd(e.target.value);
     updateMapAlert(state.selectedMode, e.target.value);
+    _syncClearTo();
   });
 
   document.querySelectorAll('.mode-chip').forEach((chip) => {
@@ -154,22 +180,24 @@ export const init = () => {
 
   /* ── Address autocomplete (Nominatim) ───────────── */
   createAutocomplete(
-    document.getElementById('current-location'),
+    locationInput,
     (label, lat, lng) => {
       state.routeStart = [lat, lng];
       updateMapStart(label);
       setStartMarker([lat, lng], label);
       centreOn([lat, lng], 15);
+      _syncClearFrom();
     }
   );
 
   createAutocomplete(
-    document.getElementById('destination'),
+    destinationInput,
     (label, lat, lng) => {
       state.routeEnd = [lat, lng];
       updateMapEnd(label);
       updateMapAlert(state.selectedMode, label);
       setEndMarker([lat, lng], label);
+      _syncClearTo();
     }
   );
 
@@ -199,6 +227,8 @@ export const init = () => {
       if (mode === 'from') { fromEl.value = label; state.routeStart = [lat, lng]; }
       else                  { toEl.value   = label; state.routeEnd   = [lat, lng]; }
     }
+    _syncClearFrom();
+    _syncClearTo();
     _setPickActive(mode === 'from' ? 'to' : null);
     showToast(mode === 'from' ? 'Start set — now tap to set destination.' : 'Destination set.');
     if (mode === 'from') enablePickMode('to', _onMapPick);
