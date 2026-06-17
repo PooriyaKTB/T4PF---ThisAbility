@@ -197,9 +197,9 @@
   border-color: var(--border);
 }
 
-/* Route map loading background (shows before OSM tiles paint) */
+/* Route map loading background — matches CartoDB Dark Matter tile colour */
 .phone-frame.dark .route-map {
-  background: #1e2d45;
+  background: #1a1a2e;
 }
 
 /* Chips — hardcoded light backgrounds become invisible in dark mode */

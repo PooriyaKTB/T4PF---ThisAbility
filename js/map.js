@@ -3,6 +3,7 @@ import { fetchLiftFaults } from './tfl.js';
 const LONDON = [51.5074, -0.1278];
 
 let _map         = null;
+let _tileLayer   = null;
 let _startMarker = null;
 let _endMarker   = null;
 let _liveMarker  = null;
@@ -10,8 +11,11 @@ let _routeLine   = null;
 let _legLines    = [];
 let _faultLayer  = null;
 
-const OSM_TILE   = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const OSM_CREDIT = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+const _isDark = () => document.querySelector('.phone-frame')?.classList.contains('dark') ?? false;
+
+const TILE_LIGHT  = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const TILE_DARK   = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_CREDIT = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
 
 const START_STYLE = { radius: 9, fillColor: '#2563eb', color: '#fff', weight: 2.5, fillOpacity: 1 };
 const END_STYLE   = { radius: 9, fillColor: '#0f766e', color: '#fff', weight: 2.5, fillOpacity: 1 };
@@ -33,8 +37,16 @@ const _create = () => {
     attributionControl: true,
   });
 
-  L.tileLayer(OSM_TILE, { attribution: OSM_CREDIT, maxZoom: 19 }).addTo(_map);
+  _tileLayer = L.tileLayer(_isDark() ? TILE_DARK : TILE_LIGHT, { attribution: TILE_CREDIT, maxZoom: 19 }).addTo(_map);
   _faultLayer = L.layerGroup().addTo(_map);
+
+  // Swap tile theme whenever dark mode is toggled
+  const frame = document.querySelector('.phone-frame');
+  if (frame) {
+    new MutationObserver(() => {
+      if (_tileLayer) _tileLayer.setUrl(_isDark() ? TILE_DARK : TILE_LIGHT);
+    }).observe(frame, { attributes: true, attributeFilter: ['class'] });
+  }
 
   // Force tile grid recalculation after the container is fully painted.
   // setView (not just invalidateSize) makes Leaflet recalculate tile coords from scratch.
