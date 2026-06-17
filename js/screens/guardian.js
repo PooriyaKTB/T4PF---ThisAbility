@@ -138,31 +138,34 @@ export const init = () => {
   const _onFall = () => runGuardianSim('fall', 'sensor');
 
   const _armSensor = async (fromGesture = false) => {
-    // Request notification permission alongside sensor arming (must be user gesture)
-    if (fromGesture) {
-      const perm = await requestNotifPerm();
-      if (perm === 'granted') {
-        showToast('Guardian notifications enabled.');
-      }
-    }
-
     if (!isSupported()) {
       _updateSensorChip(sensorChip, 'manual');
       return;
     }
+
+    // DeviceMotion permission MUST be requested first, before any other await,
+    // so iOS 13+ still considers this call part of the original user gesture.
     try {
-      if (fromGesture) await requestPermission(); // DeviceMotion permission (iOS)
-      startDetector(_onFall);
-      _updateSensorChip(sensorChip, 'armed');
-      stateEl.textContent = 'Armed + sensing';
+      if (fromGesture) await requestPermission();
     } catch (err) {
       if (err.message === 'denied') {
         showToast('Motion sensor denied — using manual simulation only.');
         _updateSensorChip(sensorChip, 'manual');
-      } else {
-        // iOS without a user gesture — prompt user to tap toggle
-        _updateSensorChip(sensorChip, 'tap');
+        return;
       }
+      // Any other error (e.g. no gesture context on iOS) — prompt user to tap again
+      _updateSensorChip(sensorChip, 'tap');
+      return;
+    }
+
+    startDetector(_onFall);
+    _updateSensorChip(sensorChip, 'armed');
+    stateEl.textContent = 'Armed + sensing';
+
+    // Notification permission can follow any awaits — gesture context no longer matters here
+    if (fromGesture) {
+      const perm = await requestNotifPerm();
+      if (perm === 'granted') showToast('Guardian notifications enabled.');
     }
   };
 
