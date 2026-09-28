@@ -1,5 +1,6 @@
 import { fetchLiftFaults } from './tfl.js';
 import { userProfile } from './state.js';
+import { CARTO_API_KEY } from './config.js';
 
 const LONDON = [51.5074, -0.1278];
 
@@ -91,13 +92,17 @@ const _tileUrl = () => {
 
 export const refreshTileTheme = () => { if (_tileLayer) _tileLayer.setUrl(_tileUrl()); };
 
+// CARTO raster basemaps require an API key on public domains (otherwise tiles show an "API key required" watermark)
+const _cartoUrl = (style) =>
+  `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png${CARTO_API_KEY ? `?key=${CARTO_API_KEY}` : ''}`;
+
 const TILE_CREDIT = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
 
 export const MAP_THEMES = {
   auto:          { label: 'Auto (follows dark / high-contrast mode)', url: null },
-  positron:      { label: 'Positron — light, minimal',                url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' },
-  voyager:       { label: 'Voyager — balanced, colourful',            url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' },
-  'dark-matter': { label: 'Dark Matter — dark navy',                  url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' },
+  positron:      { label: 'Positron — light, minimal',                url: _cartoUrl('light_all') },
+  voyager:       { label: 'Voyager — balanced, colourful',            url: _cartoUrl('rastertiles/voyager') },
+  'dark-matter': { label: 'Dark Matter — dark navy',                  url: _cartoUrl('dark_all') },
   osm:           { label: 'OpenStreetMap — standard',                 url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' },
   hot:           { label: 'HOT — warm, humanitarian',                 url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png' },
   topo:          { label: 'OpenTopoMap — terrain',                    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png' },
