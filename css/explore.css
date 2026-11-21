@@ -1,3 +1,16 @@
+/* Only when explore is the active screen: flex column so route-map can flex-grow to nav bar.
+   Must use .screen.active so this doesn't override display:none on inactive state. */
+.screen.active[data-screen="explore"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Prevent the routing form from shrinking when route-map has flex:1 */
+#route-form {
+  flex-shrink: 0;
+}
+
 .scan-alert-item {
   margin-top: 8px;
   padding: 10px;
@@ -9,6 +22,12 @@
   animation: screenFadeIn 0.22s ease;
 }
 
+/* ── Routing input stack with swap button ─── */
+.routing-inputs-stack {
+  position: relative;
+  margin-bottom: 10px;
+}
+
 .routing-input {
   display: flex;
   align-items: center;
@@ -17,8 +36,99 @@
   border: 1px solid #d9e9ff;
   padding: 10px;
   border-radius: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0;
+  position: relative; /* anchor for autocomplete dropdown */
 }
+
+.routing-inputs-stack .routing-input:first-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-bottom-color: transparent;
+}
+
+.routing-inputs-stack .routing-input:last-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.swap-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--primary);
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  transition: background 0.15s;
+}
+.swap-btn:hover { background: var(--surface-soft); }
+
+/* ── Autocomplete dropdown ─────────────────────────── */
+.ac-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: -1px;
+  right: -1px;
+  z-index: 1000;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ac-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 1px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.ac-item:last-child { border-bottom: none; }
+
+.ac-item i {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--primary);
+  font-size: 0.78rem;
+}
+
+.ac-primary {
+  font-weight: 500;
+  color: var(--text-main);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ac-secondary {
+  font-size: 0.68rem;
+  color: var(--text-light);
+}
+
+.ac-item:hover,
+.ac-item.active,
+.ac-item:focus-visible { background: var(--surface-soft); outline: 2px solid var(--primary); outline-offset: -2px; }
 
 .routing-input i {
   color: var(--primary);
@@ -36,78 +146,178 @@
   color: var(--text-main);
 }
 
-.route-map {
-  overflow: hidden;
-  min-height: 170px;
-  position: relative;
-  background:
-    linear-gradient(90deg, rgba(37, 99, 235, 0.12) 1px, transparent 1px),
-    linear-gradient(rgba(15, 118, 110, 0.11) 1px, transparent 1px),
-    #f8fbff;
-  background-size: 42px 42px;
-  margin-bottom: 14px;
-}
-
-.route-line {
-  position: absolute;
-  left: 34px;
-  top: 114px;
-  width: 274px;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  border-radius: 999px;
-  transform: rotate(-12deg);
-  transform-origin: left center;
-}
-
-.route-line::before,
-.route-line::after {
-  content: "";
-  position: absolute;
-  top: 50%;
+.input-clear-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  color: var(--text-light);
+  font-size: 0.78rem;
+  cursor: pointer;
+  opacity: 0.65;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  transform: translateY(-50%);
-  background: white;
-  border: 5px solid var(--primary);
+  transition: opacity 0.15s, background 0.15s;
+}
+.input-clear-btn:hover { opacity: 1; background: rgba(0,0,0,0.07); }
+
+.route-map {
+  overflow: hidden;
+  flex: 1;          /* fills remaining height so map reaches the frosted nav bar */
+  min-height: 220px;
+  position: relative;
+  margin-bottom: 12px;
+  background: #e8edf2;
+  border-radius: 12px;
 }
 
-.route-line::before {
-  left: -4px;
-}
-
-.route-line::after {
-  right: -4px;
-  border-color: var(--secondary);
-}
-
-.map-tag {
+/* ── Tap-to-set from/to bar ─── */
+.map-pick-bar {
   position: absolute;
-  border-radius: 999px;
-  padding: 6px 9px;
-  background: white;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
-  font-size: 0.7rem;
-  font-weight: 800;
-}
-
-.tag-start {
+  top: 8px;
   left: 8px;
-  bottom: 10px;
-}
-
-.tag-end {
   right: 8px;
-  top: 10px;
+  z-index: 600; /* above fault-badge (500) so pick bar always wins the overlap */
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  pointer-events: none;
+}
+.map-pick-bar[hidden] { display: none; }
+
+.map-pick-btn {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  background: white;
+  color: var(--text-light);
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.map-pick-btn.active {
+  background: var(--primary);
+  color: white;
+}
+.map-pick-btn i { font-size: 0.65rem; }
+
+.map-pick-close {
+  pointer-events: all;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  color: var(--text-light);
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
-.tag-alert {
-  left: 50%;
-  top: 10px;
-  transform: translateX(-50%);
-  white-space: nowrap;
+#leaflet-map {
+  height: 100%;
+  min-height: 220px; /* fallback so Leaflet's offsetHeight===0 guard doesn't bail before 100% resolves */
+  width: 100%;
+}
+
+/* Undo the global box-sizing reset for all Leaflet internals */
+.leaflet-container,
+.leaflet-container * {
+  box-sizing: content-box;
+}
+
+/* Live user position dot — pulsing blue circle placed by setLiveMarker() */
+.live-position-dot {
+  display: block;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  animation: livePulse 2s ease-out infinite;
+}
+
+@keyframes livePulse {
+  0%   { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0); }
+}
+
+/* ── Route flow orb — glowing pulse that sweeps from start to destination ── */
+.flow-orb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffffff 0%, #93c5fd 35%, #2563eb 65%, transparent 100%);
+  box-shadow:
+    0 0 6px  3px rgba(37, 99, 235, 0.55),
+    0 0 14px 6px rgba(37, 99, 235, 0.30);
+  animation: flowGlow 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes flowGlow {
+  from {
+    box-shadow:
+      0 0 6px  3px rgba(37, 99, 235, 0.50),
+      0 0 14px 6px rgba(37, 99, 235, 0.25);
+  }
+  to {
+    box-shadow:
+      0 0 10px 5px rgba(37, 99, 235, 0.80),
+      0 0 22px 10px rgba(37, 99, 235, 0.40);
+  }
+}
+
+.leaflet-control-attribution {
+  font-size: 0.5rem !important;
+  padding: 1px 4px !important;
+  line-height: 1.2 !important;
+  opacity: 0.7;
+}
+
+.fault-badge {
+  position: absolute;
+  bottom: 8px; /* moved from top — pick bar is at top: 8px; both are now visible simultaneously */
+  left: 8px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: rgba(239, 68, 68, 0.92);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap; /* prevent "disruption s live" line-break inside the badge */
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.fault-badge[hidden] {
+  display: none;
+}
+
+.fault-badge i {
+  font-size: 0.65rem;
 }
 
 .route-result {
@@ -192,4 +402,122 @@
 
 .module-detail.visible {
   display: block;
+}
+
+/* ── Modules collapsible section ─── */
+.modules-disclosure {
+  margin-top: 12px;
+}
+
+#surround-scan-card {
+  margin-top: 12px;
+}
+
+.modules-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 4px;
+  user-select: none;
+}
+.modules-summary::-webkit-details-marker { display: none; }
+.modules-summary i:first-child { color: var(--primary); font-size: 0.75rem; }
+
+.modules-chevron {
+  margin-left: auto;
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+}
+
+.modules-disclosure[open] .modules-chevron {
+  transform: rotate(180deg);
+}
+
+.modules-disclosure .modules-grid {
+  margin-top: 8px;
+}
+
+/* ── Live Obstacle Alert — per-disruption rows ─── */
+.disruption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  animation: screenFadeIn 0.22s ease;
+}
+
+.disruption-row:last-child {
+  border-bottom: none;
+}
+
+.disruption-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--text-main);
+  flex: 1;
+  min-width: 0;
+}
+
+.disruption-info i {
+  color: var(--warning);
+  flex-shrink: 0;
+}
+
+.disruption-info span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.disruption-row-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.disruption-verify-btn,
+.disruption-avoid-btn {
+  cursor: pointer;
+  border: none;
+  font-size: 0.68rem;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.disruption-verify-btn {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.disruption-verify-btn:hover:not(:disabled) { background: #fde68a; }
+
+.disruption-verify-btn.verified {
+  background: #d1fae5;
+  color: #065f46;
+  cursor: default;
+}
+
+.disruption-avoid-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.disruption-avoid-btn:hover:not(:disabled) { background: #fecaca; }
+
+.disruption-avoid-btn.avoided {
+  background: #e0e7ff;
+  color: #3730a3;
+  cursor: default;
 }

@@ -1,9 +1,87 @@
-import { userProfile, state, screenCopy } from './state.js';
+import { userProfile, state, screenCopy, saveProfile } from './state.js';
+import { initMap } from './map.js';
 
 const phoneFrame = document.getElementById('phone-frame');
 const toast      = document.getElementById('toast');
 const toastMsg   = document.getElementById('toast-message');
 const content    = document.getElementById('content');
+const header     = document.querySelector('header');
+
+// Collapse on scroll-down past threshold.
+// Expand only when user intentionally forces past the top:
+//   desktop → wheel up while already at scrollTop 0
+//   mobile  → touch-drag down ≥36px while already at scrollTop 0
+let _collapsed = false;
+let _touchY0 = null;
+
+content.addEventListener('scroll', () => {
+  if (!_collapsed && content.scrollTop > 40) {
+    header.classList.add('collapsed');
+    _collapsed = true;
+  }
+  // Reset touch anchor each time we land at the top
+  if (content.scrollTop === 0) _touchY0 = null;
+}, { passive: true });
+
+// Desktop: wheel-up past top
+content.addEventListener('wheel', (e) => {
+  if (_collapsed && content.scrollTop === 0 && e.deltaY < 0) {
+    header.classList.remove('collapsed');
+    _collapsed = false;
+  }
+}, { passive: true });
+
+// Mobile: pull-down past top
+content.addEventListener('touchstart', (e) => {
+  if (_collapsed && content.scrollTop === 0) _touchY0 = e.touches[0].clientY;
+}, { passive: true });
+
+content.addEventListener('touchmove', (e) => {
+  if (_collapsed && content.scrollTop === 0 && _touchY0 !== null) {
+    if (e.touches[0].clientY - _touchY0 > 36) {
+      header.classList.remove('collapsed');
+      _collapsed = false;
+      _touchY0 = null;
+    }
+  }
+}, { passive: true });
+
+content.addEventListener('touchend', () => { _touchY0 = null; }, { passive: true });
+
+/* ── Swipe left/right to change screens ──
+   Attached to phone-frame (not content) so Leaflet map touch events don't block it. */
+const SCREENS = ['explore', 'passport', 'guardian', 'settings'];
+let _swipeX0 = null;
+let _swipeY0 = null;
+
+phoneFrame.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#leaflet-map')) { _swipeX0 = null; return; }
+  _swipeX0 = e.touches[0].clientX;
+  _swipeY0 = e.touches[0].clientY;
+}, { passive: true });
+
+phoneFrame.addEventListener('touchend', (e) => {
+  if (_swipeX0 === null) return;
+  const dx = e.changedTouches[0].clientX - _swipeX0;
+  const dy = e.changedTouches[0].clientY - _swipeY0;
+  _swipeX0 = null;
+  _swipeY0 = null;
+  // Require at least 50px horizontal and more horizontal than vertical
+  if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+  const idx = SCREENS.indexOf(state.currentScreen);
+  if (idx === -1) return;
+  const next = dx < 0 ? SCREENS[idx + 1] : SCREENS[idx - 1];
+  if (next) setScreen(next);
+}, { passive: true });
+
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+  userProfile.darkMode = !userProfile.darkMode;
+  phoneFrame.classList.toggle('dark', userProfile.darkMode);
+  const btn = document.getElementById('dark-mode-toggle');
+  btn.setAttribute('aria-pressed', String(userProfile.darkMode));
+  saveProfile();
+  showToast(userProfile.darkMode ? 'Dark mode on.' : 'Dark mode off.');
+});
 
 export const firstName        = () => userProfile.name.trim().split(/\s+/)[0] || 'Sarah';
 export const guardianFirstName = () => userProfile.guardian.trim().split(/\s+/)[0] || 'Maya';
@@ -65,6 +143,9 @@ export const updateProfileUi = () => {
   phoneFrame.classList.toggle('large-text',   userProfile.text === 'large');
   phoneFrame.classList.toggle('high-contrast', userProfile.contrast === 'high');
   phoneFrame.classList.toggle('calm-ui',       userProfile.contrast === 'calm');
+  phoneFrame.classList.toggle('dark',          userProfile.darkMode === true);
+  const dmBtn = document.getElementById('dark-mode-toggle');
+  if (dmBtn) dmBtn.setAttribute('aria-pressed', String(userProfile.darkMode === true));
 
   state.selectedMode = userProfile.mobility;
   syncModeButtons();
@@ -94,11 +175,20 @@ export const setScreen = (screenName) => {
         : screenCopy[screenName].heading;
   document.getElementById('screen-subtitle').textContent = screenCopy[screenName].subtitle;
   content.scrollTop = 0;
+  if (screenName === 'explore') {
+    initMap(); // double-rAF: first frame commits layout, second frame has stable dimensions
+  }
 };
 
 export const unlockDemo = (message) => {
   phoneFrame.classList.remove('demo-locked');
-  setScreen('explore');
+  setScreen('explore'); // setScreen calls initMap() with double-rAF
   updateProfileUi();
   showToast(message);
+};
+
+export const silentUnlock = () => {
+  phoneFrame.classList.remove('demo-locked');
+  setScreen('explore');
+  updateProfileUi();
 };

@@ -1,0 +1,8 @@
+[build]
+  command = "echo \"export const GRAPHHOPPER_API_KEY = '$GRAPHHOPPER_API_KEY';\" > js/config.js && echo \"export const CARTO_API_KEY = '$CARTO_API_KEY';\" >> js/config.js"
+  publish = "."
+
+# js/config.js intentionally contains browser-side API keys (they are visible to the client anyway),
+# so exclude it from Netlify's secrets scanner.
+[build.environment]
+  SECRETS_SCAN_OMIT_PATHS = "js/config.js"

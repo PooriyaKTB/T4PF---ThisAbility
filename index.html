@@ -1,13 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="assets/logo-icon.png" />
     <title>ThisAbility — Empowering Independence, Safety &amp; Dignity</title>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
@@ -74,17 +80,22 @@
         <div class="header-top">
           <div class="logo" style="display:flex;align-items:center;gap:8px;">
             <img src="assets/logo-icon.png" alt="" aria-hidden="true" style="width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1);flex-shrink:0;" />
-            ThisAbility
+            <span class="logo-text">ThisAbility</span>
           </div>
-          <button
-            class="user-profile"
-            type="button"
-            id="profile-open"
-            aria-label="Open profile"
-          >
-            <i class="fas fa-user-circle" aria-hidden="true"></i>
-            <span id="user-chip-name"></span> (Pro)
-          </button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" id="dark-mode-toggle" class="dark-mode-btn" aria-label="Toggle dark mode" aria-pressed="false">
+              <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+            <button
+              class="user-profile"
+              type="button"
+              id="profile-open"
+              aria-label="Open profile"
+            >
+              <i class="fas fa-user-circle" aria-hidden="true"></i>
+              <span id="user-chip-name"></span>
+            </button>
+          </div>
         </div>
         <h2 id="screen-heading"></h2>
         <p class="small" id="screen-subtitle" style="margin-top: 5px; opacity: 0.9">
@@ -109,45 +120,52 @@
       <div class="content" id="content">
         <section class="screen active" data-screen="explore">
           <form class="card" id="route-form">
-            <div class="section-title">Accessible Routing</div>
-            <div class="routing-input" style="position:relative;">
-              <i class="fas fa-map-marker-alt" aria-hidden="true" style="color:var(--danger);"></i>
-              <input id="current-location" type="text" value="London, Waterloo" placeholder="Enter your start location" style="flex:1;" />
-              <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
-                <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+            <div class="routing-inputs-stack">
+              <div class="routing-input" style="position:relative;">
+                <i class="fas fa-circle-dot" aria-hidden="true" style="color:var(--primary);"></i>
+                <input id="current-location" type="text" placeholder="From — your start location" style="flex:1;" />
+                <button type="button" id="clear-from-btn" class="input-clear-btn" aria-label="Clear start location" hidden>
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+                <button type="button" id="gps-btn" aria-label="Use current GPS location" title="Use current location" style="background:none;border:none;padding:0 2px;color:var(--primary);font-size:0.9rem;cursor:pointer;flex-shrink:0;">
+                  <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+                </button>
+              </div>
+              <button type="button" id="swap-btn" class="swap-btn" aria-label="Swap start and destination">
+                <i class="fas fa-up-down" aria-hidden="true"></i>
               </button>
+              <div class="routing-input">
+                <i class="fas fa-location-dot" aria-hidden="true" style="color:var(--danger);"></i>
+                <input
+                  id="destination"
+                  type="text"
+                  placeholder="Where to? (e.g. Waterloo Station)"
+                  autocomplete="off"
+                />
+                <button type="button" id="clear-to-btn" class="input-clear-btn" aria-label="Clear destination" hidden>
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
-            <div class="routing-input">
-              <i class="fas fa-search" aria-hidden="true"></i>
-              <input
-                id="destination"
-                type="text"
-                placeholder="Where to? (e.g. Waterloo Station)"
-                autocomplete="off"
-              />
-            </div>
-            <div class="mode-grid" aria-label="Route needs">
+            <div class="mode-pills" role="group" aria-label="Route preference">
               <button class="mode-chip active" type="button" data-mode="Step-free">
-                Step-free
+                <i class="fas fa-wheelchair" aria-hidden="true"></i> Step-free
               </button>
               <button class="mode-chip" type="button" data-mode="Low crowd">
-                Low crowd
+                <i class="fas fa-users-slash" aria-hidden="true"></i> Low crowd
               </button>
               <button class="mode-chip" type="button" data-mode="Quiet">
-                Quiet
+                <i class="fas fa-volume-xmark" aria-hidden="true"></i> Quiet
               </button>
               <button class="mode-chip" type="button" data-mode="Fastest">
-                Fastest
+                <i class="fas fa-bolt" aria-hidden="true"></i> Fastest
               </button>
-            </div>
-            <div style="margin-top:8px;">
-              <button class="mode-chip" type="button" data-mode="AI Agent" id="ai-route-chip" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--secondary);color:var(--secondary);">
-                <i class="fas fa-robot" aria-hidden="true"></i>
-                AI Agent — adapts to your profile &amp; live conditions
+              <button class="mode-chip mode-chip--ai" type="button" data-mode="AI Agent" id="ai-route-chip">
+                <i class="fas fa-robot" aria-hidden="true"></i> AI Agent
               </button>
             </div>
             <button class="primary-btn" type="submit" style="margin-top: 12px">
-              <i class="fas fa-magic" aria-hidden="true"></i>
+              <i class="fas fa-diamond-turn-right" aria-hidden="true"></i>
               Find Safe Route
             </button>
             <div class="route-result" id="route-result" aria-live="polite">
@@ -157,68 +175,83 @@
             </div>
           </form>
 
-          <div class="route-map" aria-label="Illustrated accessible route map">
-            <div class="route-line"></div>
-            <span class="map-tag tag-start" id="map-start">London Bridge Station</span>
-            <span class="map-tag tag-alert" id="map-alert-tag" style="color:var(--danger);">
-              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> lift outage
-            </span>
-            <span class="map-tag tag-end" id="map-destination">Waterloo</span>
+          <div class="route-map" aria-label="Accessible route map">
+            <div class="map-pick-bar" id="map-pick-bar" hidden>
+              <button class="map-pick-btn active" type="button" id="pick-to-btn">
+                <i class="fas fa-location-dot" aria-hidden="true"></i> Tap to set destination
+              </button>
+              <button class="map-pick-close" type="button" id="pick-close-btn" aria-label="Close map picker">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div id="leaflet-map"></div>
+            <div id="fault-badge" class="fault-badge" hidden aria-live="polite">
+              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+              <span><span data-count>0</span> line disruption<span data-plural>s</span> live</span>
+            </div>
           </div>
+          <!-- Hidden label refs kept for routing.js — wired to Leaflet markers in Step 6 -->
+          <span id="map-start"     class="sr-only">London Bridge Station</span>
+          <span id="map-alert-tag" class="sr-only"></span>
+          <span id="map-destination" class="sr-only">Waterloo</span>
 
-          <div class="card alert-box" id="alert-card">
+          <div class="card alert-box" id="alert-card" hidden>
             <div class="alert-header">
               <span>
-                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
                 Live Obstacle Alert
               </span>
-              <span class="chip warning" id="alert-status">Unresolved</span>
+              <span class="chip warning" id="alert-status">Disruptions</span>
             </div>
-            <p class="muted">
-              <strong>TfL data:</strong> Lift out of service at Waterloo Station.
-              Crowd telemetry confirms the barrier and proposes a step-free interchange via Southwark.
-            </p>
+            <div id="alert-body" aria-live="polite"></div>
             <div class="alert-actions">
-              <button class="secondary-btn" type="button" id="reroute-btn">
-                <i class="fas fa-random" aria-hidden="true"></i>
-                Reroute
+              <button class="secondary-btn" type="button" id="avoid-all-btn">
+                <i class="fas fa-ban" aria-hidden="true"></i>
+                Avoid All
               </button>
-              <button class="secondary-btn" type="button" id="verify-btn">
-                <i class="fas fa-check" aria-hidden="true"></i>
-                Verify
+              <button class="secondary-btn" type="button" id="verify-all-btn">
+                <i class="fas fa-check-double" aria-hidden="true"></i>
+                Verify All
               </button>
             </div>
           </div>
 
-          <div class="modules-grid">
-            <button class="module-btn active" type="button" data-module="map">
-              <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
-              <h4>Dynamic Map</h4>
-              <p>Predicts barriers with live city and crowd data.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="alerts">
-              <i class="fas fa-bell" aria-hidden="true"></i>
-              <h4>Surround Alerts</h4>
-              <p>Micro-obstacle and sensory warning layer.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="passport">
-              <i class="fas fa-id-card" aria-hidden="true"></i>
-              <h4>CapAble ID</h4>
-              <p>Optional BLE access profile for venues.</p>
-            </button>
-            <button class="module-btn" type="button" data-module="guardian">
-              <i class="fas fa-heart-pulse" aria-hidden="true"></i>
-              <h4>Guardian</h4>
-              <p>Fall detection connected to routing context.</p>
-            </button>
-          </div>
-          <div class="card module-detail visible" id="module-detail">
-            <strong id="module-title">Dynamic Map</strong>
-            <p class="muted" id="module-copy">
-              Routes combine public transport status, static accessibility data,
-              and community-verified obstacles before suggesting a journey.
-            </p>
-          </div>
+          <details class="modules-disclosure" id="modules-disclosure">
+            <summary class="modules-summary">
+              <i class="fas fa-grid-2" aria-hidden="true"></i>
+              Features
+              <i class="fas fa-chevron-down modules-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="modules-grid">
+              <button class="module-btn active" type="button" data-module="map">
+                <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+                <h4>Dynamic Map</h4>
+                <p>Predicts barriers with live city and crowd data.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="alerts">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                <h4>Surround Alerts</h4>
+                <p>Micro-obstacle and sensory warning layer.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="passport">
+                <i class="fas fa-id-card" aria-hidden="true"></i>
+                <h4>CapAble ID</h4>
+                <p>Optional BLE access profile for venues.</p>
+              </button>
+              <button class="module-btn" type="button" data-module="guardian">
+                <i class="fas fa-heart-pulse" aria-hidden="true"></i>
+                <h4>Guardian</h4>
+                <p>Fall detection connected to routing context.</p>
+              </button>
+            </div>
+            <div class="card module-detail visible" id="module-detail" aria-live="polite" aria-atomic="true">
+              <strong id="module-title">Dynamic Map</strong>
+              <p class="muted" id="module-copy">
+                Routes combine public transport status, static accessibility data,
+                and community-verified obstacles before suggesting a journey.
+              </p>
+            </div>
+          </details>
 
           <div class="card" id="surround-scan-card" style="display:none;">
             <div class="section-title">Surround Scan — Live</div>
@@ -442,6 +475,18 @@
                     <option value="calm">Calm / reduced motion</option>
                   </select>
                 </div>
+                <div class="form-field">
+                  <label for="map-theme-pref">Map theme</label>
+                  <select id="map-theme-pref">
+                    <option value="auto" selected>Auto (follows mode)</option>
+                    <option value="positron">Positron — light, minimal</option>
+                    <option value="voyager">Voyager — balanced, colourful</option>
+                    <option value="dark-matter">Dark Matter — dark navy</option>
+                    <option value="osm">OpenStreetMap — standard</option>
+                    <option value="hot">HOT — warm, humanitarian</option>
+                    <option value="topo">OpenTopoMap — terrain</option>
+                  </select>
+                </div>
                 <div class="form-field" style="grid-column:1/-1;">
                   <label>Allergies &amp; health notes</label>
                   <select id="allergy-category" style="margin-bottom:6px;">
@@ -565,6 +610,33 @@
               </div>
             </div>
           </div>
+
+          <div class="card logout-card">
+            <button class="danger-btn" type="button" id="logout-btn" style="width:100%;">
+              <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+              Sign out &amp; clear data
+            </button>
+            <p class="muted" style="font-size:0.7rem;margin-top:10px;text-align:center;">All data lives on-device only. Signing out removes your profile and settings permanently.</p>
+
+            <div id="logout-confirm" hidden>
+              <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+              <p style="font-size:0.82rem;font-weight:600;color:var(--text-main);margin-bottom:4px;">
+                <i class="fas fa-triangle-exclamation" style="color:var(--danger);" aria-hidden="true"></i>
+                Are you sure?
+              </p>
+              <p class="muted" style="font-size:0.72rem;margin-bottom:12px;">Your profile, preferences, and saved data will be permanently deleted from this device.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button class="secondary-btn" type="button" id="logout-cancel-btn">
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                  Cancel
+                </button>
+                <button class="danger-btn" type="button" id="logout-confirm-btn">
+                  <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                  Yes, sign out
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
 
@@ -593,6 +665,12 @@
       </nav>
     </main>
 
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="js/main.js"></script>
   </body>
 </html>
